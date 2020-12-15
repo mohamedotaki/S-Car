@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 
-def make_coordinates(image , line_parameter):
+def make_coordinates(line_parameter):
     try:
      slope, intercept = line_parameter
     except TypeError:
@@ -31,8 +31,8 @@ def average_slope_intercept(image, line, backup=None, x11=None):
             right_fit.append((slope,intercept))
     left_fit_average = np.average(left_fit,axis=0)
     right_fit_average = np.average(right_fit,axis=0)
-    left_line = make_coordinates(image,left_fit_average)
-    right_line = make_coordinates(image, right_fit_average)
+    left_line = make_coordinates(left_fit_average)
+    right_line = make_coordinates(right_fit_average)
 
     return np.array([left_line,right_line])
 
