@@ -1,9 +1,3 @@
-#if CONFIG_FREERTOS_UNICORE
-#define ARDUINO_RUNNING_CORE 0
-#else
-#define ARDUINO_RUNNING_CORE 1
-#endif
-
 TaskHandle_t task1Handle = NULL;
 SemaphoreHandle_t SW2_Semaphore=NULL;
     int s = 0;
@@ -58,10 +52,10 @@ void setup() {
     ,  NULL
     ,  3  // Priority
     ,  &task1Handle 
-    ,  ARDUINO_RUNNING_CORE);
+    ,  0);
 
-maxLeftServo();
     centerServo();
+    delay(10);
     motorF(1590);
 
    // parkingAssist(1);
@@ -71,8 +65,13 @@ maxLeftServo();
 void loop(){
 
 
-
-
+maxRightServo();
+delay(3000);
+    centerServo();
+    delay(3000);
+   maxLeftServo();
+       delay(3000);
+    motorF(1700);
 //Serial.print(pulseIn(26,LOW));
 //Serial.print("--");
 //Serial.print(pulseIn(26,HIGH));
@@ -94,12 +93,12 @@ void TaskAnalogReadA3(void *pvParameters)  // This is a task.
   for (;;)
   {
 f=ultrasonicValue(frontSensor);
-b=ultrasonicValue(backSensor);
-l=ultrasonicValue(leftSensor);
-r=ultrasonicValue(rightSensor);
-if(f<=5 || b <=5){
+//b=ultrasonicValue(backSensor);
+//l=ultrasonicValue(leftSensor);
+//r=ultrasonicValue(rightSensor);
+if(f<=5){
   Serial.print ("Stoooooooooooooooooop");
-  motorS();
+  motorEmergncyStop();
 }
 Serial.print (f);
 Serial.print ("  -  ");
@@ -112,37 +111,3 @@ Serial.print ("\n");
     vTaskDelay(10);  // one tick delay (15ms) in between reads for stability
   }
 }
-
-void DetectEmptySpace(void *pvParameters)  // This is a task.
-{
-  (void) pvParameters;
-  for (;;)
-  {
-f=ultrasonicValue(frontSensor);
-b=ultrasonicValue(backSensor);
-l=ultrasonicValue(leftSensor);
-r=ultrasonicValue(rightSensor);
-if(f<=5 || b <=5){
-  Serial.print ("Stoooooooooooooooooop");
-  motorS();
-}
-Serial.print (f);
-Serial.print ("  -  ");
-Serial.print (r);
-Serial.print ("  -  ");
-Serial.print (l);
-Serial.print ("  -  ");
-Serial.print (b);
-Serial.print ("\n");
-    vTaskDelay(10);  // one tick delay (15ms) in between reads for stability
-  }
-}
-
-
-
-
-
-
-
-
- 
