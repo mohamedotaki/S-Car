@@ -17,8 +17,8 @@ delay(10);
 }
 
 void rightServo(int ang){
-if(ang>=1100){
+if(ang>=1100 && ang<=1850){
    ledcWrite(1,ang);
-delay(10);
+delay(5);
 }
 }

@@ -1,5 +1,8 @@
+
+
 TaskHandle_t task1Handle = NULL;
 SemaphoreHandle_t SW2_Semaphore=NULL;
+
     int s = 0;
 const float freq = 62.43756243756244;
 const int chan = 0;
@@ -56,22 +59,19 @@ void setup() {
 
     centerServo();
     delay(10);
-    motorF(1590);
+   // motorF(1590);
 
-   // parkingAssist(1);
+  //  parkingAssist(1);
+ // vTaskSuspend(task1Handle);
+
 
 }
 
 void loop(){
 
 
-maxRightServo();
-delay(3000);
-    centerServo();
-    delay(3000);
-   maxLeftServo();
-       delay(3000);
-    motorF(1700);
+
+  //  motorF(1700);
 //Serial.print(pulseIn(26,LOW));
 //Serial.print("--");
 //Serial.print(pulseIn(26,HIGH));
@@ -80,7 +80,6 @@ delay(3000);
 //int speed =1580;
 
  
-
 
 
   
@@ -92,22 +91,73 @@ void TaskAnalogReadA3(void *pvParameters)  // This is a task.
   (void) pvParameters;
   for (;;)
   {
-f=ultrasonicValue(frontSensor);
+    int steering =1500, currentPos=0, emptySpace=0;
+    
+   // motorF(1650);
+   //motorF(1580);
+    r=ultrasonicValue(rightSensor);
+    if(r<20){
+       Serial.print(r);
+    if(currentPos ==0)currentPos=r;
+    while(r>7){
+   r=ultrasonicValue(rightSensor);
+   steering = map(r, (80/currentPos)+1, currentPos, 1850, 1100);
+        Serial.print(r);
+             Serial.print("--");
+   Serial.println(steering);
+rightServo(steering);
+
+
+    }
+    centerServo();
+    currentPos=0;
+    while(r>7){
+      emptySpace++;
+      Serial.print(emptySpace);
+      if(emptySpace > 20){
+        r=ultrasonicValue(rightSensor);
+        if(currentPos ==0)currentPos=r;
+        steering = map(r, (80/currentPos)+1, currentPos, 1100, 1850);
+        rightServo(steering);
+      }
+    }
+    
+    }else{
+      Serial.print("too far");
+      currentPos=0;
+    }
+
+
+
+
+
+
+
+
+
+
+    
+
+//f=ultrasonicValue(frontSensor);
 //b=ultrasonicValue(backSensor);
 //l=ultrasonicValue(leftSensor);
 //r=ultrasonicValue(rightSensor);
-if(f<=5){
-  Serial.print ("Stoooooooooooooooooop");
-  motorEmergncyStop();
-}
-Serial.print (f);
-Serial.print ("  -  ");
-Serial.print (r);
-Serial.print ("  -  ");
-Serial.print (l);
-Serial.print ("  -  ");
-Serial.print (b);
-Serial.print ("\n");
-    vTaskDelay(10);  // one tick delay (15ms) in between reads for stability
+//if(f<=5){
+//  Serial.print ("Stoooooooooooooooooop");
+// // motorEmergncyStop();
+//}
+//Serial.print ("\n");
+//Serial.print (f);
+//Serial.print ("  -  ");
+//Serial.print (r);
+//Serial.print ("  -  ");
+//Serial.print (l);
+//Serial.print ("  -  ");
+//Serial.print (b);
+//Serial.print ("\n");
+//
+//    vTaskDelay(10);  // one tick delay (15ms) in between reads for stability
+     
+
   }
 }

@@ -5,6 +5,7 @@ switch (side){
   
   //right side
   case 1:
+  Serial.print("ssssssssss");
       while(r>8 && r<15){
         motorF(1580);
         rightServo(1300); 
