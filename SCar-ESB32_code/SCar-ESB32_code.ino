@@ -46,7 +46,7 @@ void setup() {
   ledcAttachPin(escSignal, chan);
   ledcAttachPin(5, 1);
     ledcWrite(chan,1489);
-    delay(3000);
+    delay(4000);
 
      xTaskCreatePinnedToCore(
     TaskAnalogReadA3
@@ -58,7 +58,9 @@ void setup() {
     ,  0);
 
     centerServo();
-    delay(10);
+   //maxRightServo();
+ //  maxLeftServo();
+    delay(1000);
    // motorF(1590);
 
   //  parkingAssist(1);
@@ -88,6 +90,7 @@ void loop(){
 
 void TaskAnalogReadA3(void *pvParameters)  // This is a task.
 {
+     int s=0;
   (void) pvParameters;
   for (;;)
   {
@@ -95,16 +98,28 @@ void TaskAnalogReadA3(void *pvParameters)  // This is a task.
     
    // motorF(1650);
    //motorF(1580);
+f=ultrasonicValue(frontSensor);
     r=ultrasonicValue(rightSensor);
-    if(r<20){
+    b=ultrasonicValue(backSensor);
+Serial.print(r);
+Serial.print("---");
+Serial.println(b);
+  
+      //searchForEmptySpace(r);
+      park();
+   vTaskSuspend(NULL);
+    if(r<1){
        Serial.print(r);
     if(currentPos ==0)currentPos=r;
-    while(r>7){
+    while(r>6){
    r=ultrasonicValue(rightSensor);
    steering = map(r, (80/currentPos)+1, currentPos, 1850, 1100);
         Serial.print(r);
              Serial.print("--");
    Serial.println(steering);
+   if(r<=10){
+    steering = steering+50;
+   }
 rightServo(steering);
 
 
@@ -123,7 +138,7 @@ rightServo(steering);
     }
     
     }else{
-      Serial.print("too far");
+     // Serial.print("too far");
       currentPos=0;
     }
 

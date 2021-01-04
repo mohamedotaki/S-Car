@@ -7,7 +7,7 @@ delay(10);
 }
 
 void maxLeftServo(){
-  ledcWrite(1,1850);
+  ledcWrite(1,1900);
 delay(10);  
 }
 
@@ -17,7 +17,7 @@ delay(10);
 }
 
 void rightServo(int ang){
-if(ang>=1100 && ang<=1850){
+if(ang>=1100 && ang<=1900){
    ledcWrite(1,ang);
 delay(5);
 }
