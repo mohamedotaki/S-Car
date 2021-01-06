@@ -7,49 +7,120 @@
     tools:context=".ControlCar"
     android:background="@color/main">
 
-    <ImageView
-        android:layout_width="93dp"
-        android:layout_height="101dp"
-        android:src="@drawable/buttom_arrow"
-        tools:layout_editor_absoluteX="159dp"
-        tools:layout_editor_absoluteY="556dp" />
-
-    <ImageView
-        android:layout_width="93dp"
-        android:layout_height="101dp"
-        android:src="@drawable/right_arrow"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.571"
-        app:layout_constraintStart_toEndOf="@+id/imageView2"
-        tools:layout_editor_absoluteY="456dp" />
-
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="93dp"
-        android:layout_height="101dp"
-        android:layout_marginStart="64dp"
-        android:layout_marginLeft="64dp"
-        android:src="@drawable/left_arrow"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="456dp" />
-
-    <Button
+    <TextView
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Front Sensor"
+        android:textSize="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/topArrow"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/backSensorTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Back Sensor"
+        android:textSize="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bottomArrow" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Right "
+        android:textSize="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomArrow"
+        app:layout_constraintStart_toEndOf="@+id/rightArrow"
+        app:layout_constraintTop_toBottomOf="@+id/topArrow" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Left"
+        android:textSize="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomArrow"
+        app:layout_constraintEnd_toStartOf="@+id/leftArrow"
+        app:layout_constraintTop_toBottomOf="@+id/topArrow"
+        app:layout_constraintVertical_bias="0.507" />
+
+    <ImageButton
+        android:id="@+id/bottomArrow"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:padding="0dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/buttom_arrow"
+        app:layout_constraintEnd_toStartOf="@+id/rightArrow"
+        app:layout_constraintStart_toStartOf="@+id/StopButton"
+        app:layout_constraintTop_toBottomOf="@+id/StopButton" />
+
+    <ImageButton
+        android:id="@+id/topArrow"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:padding="0dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/up_arrow"
+        app:layout_constraintBottom_toTopOf="@+id/StopButton"
+        app:layout_constraintEnd_toStartOf="@+id/rightArrow"
+        app:layout_constraintStart_toStartOf="@+id/StopButton" />
+
+    <ImageButton
+        android:id="@+id/rightArrow"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+
+        android:padding="0dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/right_arrow"
+        app:layout_constraintBottom_toTopOf="@+id/bottomArrow"
+        app:layout_constraintStart_toEndOf="@+id/StopButton"
+        app:layout_constraintTop_toBottomOf="@+id/topArrow" />
+
+    <Button
+        android:id="@+id/StopButton"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
         android:background="@color/main"
+
         android:outlineProvider="none"
         android:text="Stop"
         android:textColor="#EEA60000"
         android:textSize="25dp"
         android:textStyle="bold"
-        tools:layout_editor_absoluteX="161dp"
-        tools:layout_editor_absoluteY="480dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:layout_width="93dp"
-        android:layout_height="101dp"
-        android:src="@drawable/up_arrow"
-        tools:layout_editor_absoluteX="159dp"
-        tools:layout_editor_absoluteY="355dp" />
+    <ImageButton
+        android:id="@+id/leftArrow"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:padding="0dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/left_arrow"
+        app:layout_constraintBottom_toTopOf="@+id/bottomArrow"
+        app:layout_constraintEnd_toStartOf="@+id/StopButton"
+        app:layout_constraintTop_toBottomOf="@+id/topArrow" />
+
+    <ImageButton
+        android:id="@+id/parkingAssistButton"
+        android:layout_width="67dp"
+        android:layout_height="64dp"
+        android:background="@color/main"
+        android:padding="0dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/parking_button"
+        app:layout_constraintBottom_toTopOf="@+id/textView4"
+        app:layout_constraintEnd_toStartOf="@+id/topArrow"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

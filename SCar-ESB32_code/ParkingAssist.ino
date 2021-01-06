@@ -1,66 +1,66 @@
-void parkingAssist(int side){
-//            Serial.println("on");
-//int emptySpace=0;
-//switch (side){
-//  
-//  //right side
-//  case 1:
-//  Serial.print("ssssssssss");
-//      while(r>8 && r<15){
-//        motorF(1580);
-//        rightServo(1300); 
-//        delay(15);
-//      }
-//      centerServo();
-//      while(emptySpace<10){
-//        if(r >14){
-//          emptySpace = emptySpace +1;
-//          Serial.println(emptySpace);
-//        }else emptySpace =0;
-//      }
-//      motorS();
-//      maxRightServo();
-//  break;
-//  //left side
-//    case 2:
-//    Serial.println("left");
-//    break;
-//}
+int steering =1500, currentPos=0, emptySpace=0;
+
+
+void parkingAssist(){
+  
+    searchForEmptySpace();
+    //fixPosition();
+   // park();
 }
-void searchForEmptySpace(int r ){
+void searchForEmptySpace( ){
+  
   int safeDis=0;
-    if(r>33){
-      motorR(1360);
+    r=ultrasonicValue(rightSensor);
+    if(r>carWidth){
       b=ultrasonicValue(backSensor);
       int back=0;
-      if(back ==0) back =b;
-      while(r>33 && (back-15)<b ){
-         Serial.println("reversing");
+      back =b;
+      motorR(reversingSpeed);
+      while(r>carWidth && (back-25)<=b){
+        motorR(map(b,back-25,back,1400,reversingSpeed));
          b=ultrasonicValue(backSensor);
          r=ultrasonicValue(rightSensor);
-         if(back !=b){
-        safeDis =safeDis+1;
-         }
-        Serial.println(safeDis);
       }
       motorS();
-      delay(50);
-      motorF(1600);
+      safeDis = back - b;
+      delay(500);
       f=ultrasonicValue(frontSensor);
-      int front=r;
-          while(r>30 && (front-15)<f && safeDis <=8){
-             Serial.println("forword");
+      r=ultrasonicValue(rightSensor);
+      int front=f, right =r, posBesideObject=0;
+          while(r>carWidth && (front-50)<f ){
+             motorF(map(f,front-50,front,1580,forwardSpeed));
              f=ultrasonicValue(frontSensor);
              r=ultrasonicValue(rightSensor);
-             Serial.print(f);
-             Serial.println("forword");
-             if(front != f){
-            safeDis =safeDis+1;
-            Serial.println(safeDis);
-             }
-          }
+             if(r<carWidth-10) posBesideObject=f;
+          } 
           motorS();
-           Serial.println(safeDis);
+      f=ultrasonicValue(frontSensor);  
+      safeDis = front-f +15;  
+      posBesideObject = posBesideObject - f; 
+      front=f;  
+      while(f > (front - 20-posBesideObject)){
+              Serial.print("1:");
+          Serial.println(front);
+      //  motorF(map(f,(front-20-posBesideObject),front,1580,forwardSpeed));
+        f=ultrasonicValue(frontSensor); 
+     break;
+      }
+      motorS();
+      if(safeDis>50 && r >carWidth){
+        
+      }
+//             if(r<10){
+//              beforParkingPos++;
+//              if(beforParkingPos >=4){
+//                  Serial.print("beside car");
+//             Serial.println(beforParkingPos);
+//              break;
+//              }
+//             }
+          
+         // Serial.print("after");
+         //  Serial.println(safeDis);
+          
    
       }
       motorS();
@@ -68,17 +68,42 @@ void searchForEmptySpace(int r ){
       
     
 }
-void park(){
+void fixPosition(){
+     r=ultrasonicValue(rightSensor);
+   if(r<20){
+       Serial.print(r);
+    currentPos=r;
+    while(r>6){
+      motorF(forwardSpeed);
+   r=ultrasonicValue(rightSensor);
+   steering = map(r, (80/currentPos)+1, currentPos, 1850, 1100);
+        Serial.print(r);
+             Serial.print("--");
+   Serial.println(steering);
+   if(r<=10){
+    steering = steering+50;
+   }
+rightServo(steering);
 
+
+    }
+    centerServo();
+    motorS();
+    currentPos=0;
+}
+}
+
+void park(){
+  motorS();
   r=ultrasonicValue(rightSensor);
  int currentPos=r,steering=0;
- motorR(1200);
+ motorR(reversingSpeed);
 while(true){
   f=ultrasonicValue(frontSensor);
   r=ultrasonicValue(rightSensor);
   b=ultrasonicValue(backSensor);
     Serial.print(f);
-   steering = map(r, currentPos, currentPos+20, 1150, 1900);
+   steering = map(r, currentPos, currentPos+20, 1100, 1900);
   if(steering<1500){
     steering =1100;
   }else{
@@ -88,7 +113,7 @@ while(true){
   if(b<9){
     motorS();
     maxRightServo();
-    motorF(1580);
+    motorF(forwardSpeed);
     while(f>6){
       f=ultrasonicValue(frontSensor);
     }
@@ -118,6 +143,8 @@ while(true){
 //      motorS();
 //    }
   }
+
+
 
 
 

@@ -24,7 +24,7 @@ public class ConnectionToServer {
                     InputStream is = null;
                     String result=null;
                     String line = null;
-                    URL url = new URL("http://10.0.2.2/S_Car_Server_war_exploded/" + "Login");
+                    URL url = new URL("http://localhost:8080/S_Car_Server_war_exploded/" + "Login");
                     HttpURLConnection con = (HttpURLConnection) url.openConnection();
                     con.setDoInput(true);
                     con.setRequestMethod("GET");

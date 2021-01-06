@@ -18,7 +18,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ControlCar"></activity>
+        <activity android:name=".SettingsActivity"></activity>
+        <activity
+            android:name=".DriversActivity"
+            android:label="@string/title_activity_drivers"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ControlCar" />
         <activity android:name=".Register" />
         <activity android:name=".HomeActivity" />
         <activity

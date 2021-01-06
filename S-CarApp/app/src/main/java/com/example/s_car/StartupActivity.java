@@ -12,7 +12,9 @@ import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -21,11 +23,18 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 public class StartupActivity extends AppCompatActivity {
 
     private static final int per=1;
     private static final String TAG = "StartupActivity";
-    ImageView imageView;
+    ImageView coverImage , carImage;
     long time = 5000;
     Button register, login;
     EditText password,email;
@@ -40,20 +49,22 @@ public class StartupActivity extends AppCompatActivity {
         email = (EditText) findViewById(R.id.emailEditText);
         register = (Button) findViewById(R.id.registerButton);
         login = (Button) findViewById(R.id.loginButton);
-        imageView = (ImageView) findViewById(R.id.startupWhiteCover);
+        coverImage = (ImageView) findViewById(R.id.startupWhiteCover);
+        carImage = (ImageView) findViewById(R.id.startupImageView);
         rememberLogin = (CheckBox) findViewById(R.id.rememberLogin);
 
+        Animation(coverImage);
 
-        Animation();
         VerifyPermissions();
         checkIfLoggedIn();
-
+       ConnectionToServer.login();
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(!email.getText().toString().isEmpty() && !password.getText().toString().isEmpty() ){
                     Intent intent = new Intent(getApplicationContext(),HomeActivity.class);
                     startActivity(intent);
+
                 }else{
                     Toast.makeText(StartupActivity.this,"Email & Password can't be empty",Toast.LENGTH_SHORT).show();
                 }
@@ -75,8 +86,8 @@ public class StartupActivity extends AppCompatActivity {
 
 
     }
-    public void Animation(){
-        ObjectAnimator animator = ObjectAnimator.ofFloat(imageView,"x",1000f);
+    public void Animation(ImageView image){
+        ObjectAnimator animator = ObjectAnimator.ofFloat(image,"x",1000f);
         animator.setDuration(time);
         AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.playTogether(animator);
@@ -92,6 +103,35 @@ public class StartupActivity extends AppCompatActivity {
             Toast.makeText(StartupActivity.this,"Please Login",Toast.LENGTH_SHORT).show();
 
         }
+    }
+
+    public void checkLogin (){
+        Runnable runnable = new Runnable(){
+            public void run() {
+                try {
+                    InputStream is = null;
+                    String result=null;
+                    String line = null;
+                    URL url = new URL("http://localhost:8080/S_Car_Server_war_exploded/" + "Login");
+                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                    con.setDoInput(true);
+                    con.setRequestMethod("GET");
+                    is = new BufferedInputStream(con.getInputStream());
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
+                    StringBuilder stringBuilder = new StringBuilder();
+                    while ((line = bufferedReader.readLine()) != null) {
+                        stringBuilder.append(line + "\n");
+                    }
+                    is.close();
+
+
+                    result = stringBuilder.toString();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
     }
 
     private void VerifyPermissions() {

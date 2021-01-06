@@ -1,4 +1,10 @@
+#include "BluetoothSerial.h"
 
+#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
+#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
+#endif
+
+BluetoothSerial SerialBT;
 
 TaskHandle_t task1Handle = NULL;
 SemaphoreHandle_t SW2_Semaphore=NULL;
@@ -16,7 +22,11 @@ int leitura = 0;
 int ciclo_A = 0;
 
 
-
+const int Analog_channel_pin= 33;
+int ADC_VALUE = 0;
+int voltage_value = 0; 
+int rotation=0;
+int count=0;
 
 
 //no changes 
@@ -25,7 +35,10 @@ const int backSensor = 0;
 const int rightSensor = 16;
 const int leftSensor = 4;
 int f,r,l,b;
-
+int reversingSpeed = 1340, forwardSpeed = 1600;
+int beforParkingPos=0;
+int carWidth = 35; // car width is 26cm and 10cm for safty
+int  carLength = 50; // car length is 41cm and 9cm for safty
 void TaskAnalogReadA3( void *pvParameters );
 
 
@@ -41,6 +54,7 @@ void setup() {
 
  pinMode(escSignal, OUTPUT);
   pinMode(5, OUTPUT);
+   pinMode(26, INPUT);
   
   ledcSetup(chan, freq, res);
   ledcAttachPin(escSignal, chan);
@@ -66,6 +80,8 @@ void setup() {
   //  parkingAssist(1);
  // vTaskSuspend(task1Handle);
 
+  SerialBT.begin("ESP32test"); //Bluetooth device name
+  Serial.println("The device started, now you can pair it with bluetooth!");
 
 }
 
@@ -73,13 +89,18 @@ void loop(){
 
 
 
-  //  motorF(1700);
+
+
+
+
+//
+//  //  motorF(1700);
 //Serial.print(pulseIn(26,LOW));
 //Serial.print("--");
-//Serial.print(pulseIn(26,HIGH));
-//Serial.print("--");
-//Serial.println(potValue);
-//int speed =1580;
+//Serial.println(pulseIn(26,HIGH));
+
+
+
 
  
 
@@ -90,57 +111,56 @@ void loop(){
 
 void TaskAnalogReadA3(void *pvParameters)  // This is a task.
 {
-     int s=0;
   (void) pvParameters;
   for (;;)
   {
+    f=ultrasonicValue(frontSensor);
+
+    SerialBT.write(f);
+    Serial.println(f);
+  if (SerialBT.available()) {
+    switch(SerialBT.read()){
+      case 'L':         // turn left 
+      Serial.println("left");
+      break;
+      case 'R':         // go forward or increase the speed
+      Serial.println("right");
+      break;
+      case 'F':         // go forward or increase the speed
+      Serial.println("forward");
+      break;
+      case 'B':         //  reverse or increase the speed
+      Serial.println("reverse");
+      break;
+      case 'S':         // Stop motor
+      Serial.println("stop");
+      break;
+      case 'P':         // go forward or increase the speed
+      Serial.println("parking assist");
+      break;
+    }
+     }
+     delay(20);
+
+
+
+    
     int steering =1500, currentPos=0, emptySpace=0;
     
    // motorF(1650);
    //motorF(1580);
-f=ultrasonicValue(frontSensor);
-    r=ultrasonicValue(rightSensor);
-    b=ultrasonicValue(backSensor);
-Serial.print(r);
-Serial.print("---");
-Serial.println(b);
+//f=ultrasonicValue(frontSensor);
+   // r=ultrasonicValue(rightSensor);
+   // b=ultrasonicValue(backSensor);
+//Serial.print(r);
+//Serial.print("---");
+//Serial.println(b);
   
       //searchForEmptySpace(r);
-      park();
+     // park();
+     parkingAssist();
    vTaskSuspend(NULL);
-    if(r<1){
-       Serial.print(r);
-    if(currentPos ==0)currentPos=r;
-    while(r>6){
-   r=ultrasonicValue(rightSensor);
-   steering = map(r, (80/currentPos)+1, currentPos, 1850, 1100);
-        Serial.print(r);
-             Serial.print("--");
-   Serial.println(steering);
-   if(r<=10){
-    steering = steering+50;
-   }
-rightServo(steering);
-
-
-    }
-    centerServo();
-    currentPos=0;
-    while(r>7){
-      emptySpace++;
-      Serial.print(emptySpace);
-      if(emptySpace > 20){
-        r=ultrasonicValue(rightSensor);
-        if(currentPos ==0)currentPos=r;
-        steering = map(r, (80/currentPos)+1, currentPos, 1100, 1850);
-        rightServo(steering);
-      }
-    }
-    
-    }else{
-     // Serial.print("too far");
-      currentPos=0;
-    }
+   
 
 
 
