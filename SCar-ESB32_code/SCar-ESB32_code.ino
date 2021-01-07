@@ -35,7 +35,7 @@ const int backSensor = 0;
 const int rightSensor = 16;
 const int leftSensor = 4;
 int f,r,l,b;
-int reversingSpeed = 1340, forwardSpeed = 1600;
+int reversingSpeed = 1350, forwardSpeed = 1600;
 int beforParkingPos=0;
 int carWidth = 35; // car width is 26cm and 10cm for safty
 int  carLength = 50; // car length is 41cm and 9cm for safty
@@ -60,7 +60,11 @@ void setup() {
   ledcAttachPin(escSignal, chan);
   ledcAttachPin(5, 1);
     ledcWrite(chan,1489);
-    delay(4000);
+     delay(2000);
+     ledcWrite(chan,1420);
+     delay(500);
+     ledcWrite(chan,1489);
+     delay(1000);
 
      xTaskCreatePinnedToCore(
     TaskAnalogReadA3
@@ -111,20 +115,29 @@ void loop(){
 
 void TaskAnalogReadA3(void *pvParameters)  // This is a task.
 {
+  int BTSteering =1500;
   (void) pvParameters;
   for (;;)
   {
     f=ultrasonicValue(frontSensor);
 
-    SerialBT.write(f);
+    //SerialBT.write(f);
     Serial.println(f);
   if (SerialBT.available()) {
     switch(SerialBT.read()){
       case 'L':         // turn left 
-      Serial.println("left");
+      BTSteering = BTSteering+100;
+      if(BTSteering >=1900){
+        BTSteering=1900;
+      }
+      rightServo(BTSteering);
       break;
       case 'R':         // go forward or increase the speed
-      Serial.println("right");
+      BTSteering = BTSteering-100;
+      if(BTSteering <=1100){
+        BTSteering= 1100;
+      }
+      rightServo(BTSteering);
       break;
       case 'F':         // go forward or increase the speed
       Serial.println("forward");
@@ -137,6 +150,7 @@ void TaskAnalogReadA3(void *pvParameters)  // This is a task.
       break;
       case 'P':         // go forward or increase the speed
       Serial.println("parking assist");
+       parkingAssist();
       break;
     }
      }
@@ -158,8 +172,8 @@ void TaskAnalogReadA3(void *pvParameters)  // This is a task.
   
       //searchForEmptySpace(r);
      // park();
-     parkingAssist();
-   vTaskSuspend(NULL);
+    
+
    
 
 
