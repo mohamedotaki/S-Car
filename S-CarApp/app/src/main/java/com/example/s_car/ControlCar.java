@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,8 +21,7 @@ import java.io.OutputStream;
 import java.util.Set;
 
 public class ControlCar extends AppCompatActivity {
-    OutputStream outputStream;
-    InputStream inStream;
+
     Button stop;
     ImageButton forwardButton,leftButton,rightButton,reverseButton,parkingAssistButton;
     @Override
@@ -35,8 +35,13 @@ public class ControlCar extends AppCompatActivity {
         reverseButton = (ImageButton) findViewById(R.id.bottomArrow);
         stop = (Button) findViewById(R.id.StopButton);
         try {
-            blue();
-            parkingAssistButton.setOnClickListener(new View.OnClickListener() {
+           // blue();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(ControlCar.this,"Couldn't connect",Toast.LENGTH_SHORT).show();
+            finish();
+        }
+ /*           parkingAssistButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     try {
@@ -95,14 +100,12 @@ public class ControlCar extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-            });
+            });*/
 
 
 
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
 
 
 
@@ -110,36 +113,8 @@ public class ControlCar extends AppCompatActivity {
 
     }
 
-    void blue() throws Exception{
-        BluetoothAdapter blueAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        if (blueAdapter != null) {
-            if (blueAdapter.isEnabled()) {
-                Set<BluetoothDevice> bondedDevices = blueAdapter.getBondedDevices();
 
-                if(bondedDevices.size() > 0) {
-                    Object[] devices = (Object []) bondedDevices.toArray();
-                    int position = 13;
-                    BluetoothDevice device = (BluetoothDevice) devices[position];
 
-                    ParcelUuid[] uuids = device.getUuids();
-                    BluetoothSocket socket = device.createRfcommSocketToServiceRecord(uuids[0].getUuid());
-                    socket.connect();
-                    outputStream = socket.getOutputStream();
-                    inStream = socket.getInputStream();
-                    receiveData receiveData = new receiveData(socket);
-                    //receiveData.start();
-                }
-
-                Log.e("error", "No appropriate paired devices.");
-            } else {
-                Log.e("error", "Bluetooth is disabled.");
-            }
-        }
-    }
-
-    public void write(String s) throws IOException {
-        outputStream.write(s.getBytes());
-    }
 
 }
