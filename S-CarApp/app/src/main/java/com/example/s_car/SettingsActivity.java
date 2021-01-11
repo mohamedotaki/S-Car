@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.ParcelUuid;
@@ -34,12 +35,11 @@ public class SettingsActivity extends AppCompatActivity {
     Button wifiConnectButton,enableBluetoothButton;
     ListView availableWifiList,bluetoothListView;
     EditText wifiPasswordEditText;
-    OutputStream outputStream;
-    InputStream inStream;
-    BluetoothSocket socket ;
     String[] bluetoothDevicesArray , availableWifi;
     ArrayAdapter bluetoothAdapter,wifiAdapter;
     ArrayList<BluetoothDevice> bluetoothDevicesArrayList = new ArrayList<BluetoothDevice>();
+    BluetoothSocket bluetoothSocket;
+    OutputStream outputStream;
     BluetoothAdapter blueAdapter = BluetoothAdapter.getDefaultAdapter();
 
 
@@ -57,7 +57,6 @@ public class SettingsActivity extends AppCompatActivity {
         bluetoothListView = (ListView) findViewById(R.id.bluetoothListView);
         enableBluetoothButton = (Button) findViewById(R.id.enableBluetoothButton);
 
-
         bluetoothDevicesArray = availableBluetooth();
         if(bluetoothDevicesArray!= null) {
             bluetoothAdapter = new ArrayAdapter<String>(this, R.layout.settings_adapter, R.id.bluetoothName, bluetoothDevicesArray);
@@ -66,9 +65,16 @@ public class SettingsActivity extends AppCompatActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     try {
-                        if (connectToDevice(bluetoothDevicesArrayList.get(position))) {
-                            isConnectedBluetooth.setText("Connected");
+                        bluetoothSocket = HomeActivity.connectToDevice(bluetoothDevicesArrayList.get(position));
+                        if (bluetoothSocket.isConnected()) {
+                           SharedPreferences sharedPref = getSharedPreferences("settings", MODE_PRIVATE);
+                           sharedPref.edit().putString("bluetoothDeviceName", bluetoothDevicesArrayList.get(position).getName()).commit();
+                            Toast.makeText(SettingsActivity.this,"Connected to "+ bluetoothDevicesArrayList.get(position).getName(),Toast.LENGTH_SHORT).show();
+                           outputStream = bluetoothSocket.getOutputStream();
+                            // isConnectedBluetooth.setText("Connected");
                             bluetoothAdapter.notifyDataSetChanged();
+                        }else {
+                            Toast.makeText(SettingsActivity.this,"Failed to Connect to"+ bluetoothDevicesArrayList.get(position).getName(),Toast.LENGTH_SHORT).show();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -103,19 +109,11 @@ public class SettingsActivity extends AppCompatActivity {
                     availableWifiList.setVisibility(View.VISIBLE);
                     wifiPasswordEditText.setVisibility(View.VISIBLE);
                     wifiConnectButton.setVisibility(View.VISIBLE);
-                    try {
-                        write("W");
-                    } catch (IOException e) {
-                        wifiSwitch.setText("Off");
-                        Toast.makeText(SettingsActivity.this, "Couldn't Connect to The Network", Toast.LENGTH_SHORT).show();
-                        e.printStackTrace();
-                    }
-                    receiveData receiveData = new receiveData(socket);
-                    receiveData.start();
+
 
                 }else{
                     wifiSwitch.setText("Off");
-                    Toast.makeText(SettingsActivity.this, "Please connect the car via Bluetooth first", Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(SettingsActivity.this, "Please connect the car via Bluetooth first", Toast.LENGTH_SHORT).show();
                     wifiListHeading.setVisibility(View.GONE);
                     availableWifiList.setVisibility(View.GONE);
                     wifiPasswordEditText.setVisibility(View.GONE);
@@ -152,28 +150,12 @@ public class SettingsActivity extends AppCompatActivity {
         }
         return null;
     }
-    private boolean connectToDevice(BluetoothDevice device) throws Exception{
-        Toast.makeText(SettingsActivity.this, "Connecting to " + device.getName() +", Please wait...", Toast.LENGTH_SHORT).show();
-        boolean connected = false;
-        ParcelUuid[] uuids = device.getUuids();
-         socket = device.createRfcommSocketToServiceRecord(uuids[0].getUuid());
-        if(!socket.isConnected()) {
-            socket.connect();
-        }
-        if(socket.isConnected()) {
-            Toast.makeText(SettingsActivity.this, "Connected to " + device.getName(), Toast.LENGTH_SHORT).show();
-            connected = true;
-        }else{
-            Toast.makeText(SettingsActivity.this, "Failed to connect to " + device.getName(), Toast.LENGTH_SHORT).show();
-        }
-        outputStream = socket.getOutputStream();
-        inStream = socket.getInputStream();
-        return connected;
-    }
+
 
     public void write(String s) throws IOException {
         outputStream.write(s.getBytes());
     }
+
 
 
 }

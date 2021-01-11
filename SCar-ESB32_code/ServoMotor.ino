@@ -1,24 +1,25 @@
-// servo values 1100 to 1850
+// servo values 1100 to 1900
 
 
 void centerServo(){
-  ledcWrite(1,1500);
+  ledcWrite(servoChan,1500);
 delay(10);
 }
 
 void maxLeftServo(){
-  ledcWrite(1,1900);
+  ledcWrite(servoChan,1900);
 delay(10);  
 }
 
 void maxRightServo(){
-  ledcWrite(1,1100);
+  ledcWrite(servoChan,1100);
 delay(10);
 }
 
 void rightServo(int ang){
-if(ang>=1100 && ang<=1900){
-   ledcWrite(1,ang);
-delay(5);
+if(ang>=1100 && ang <= 1900){
+   ledcWrite(servoChan,ang);
 }
+delay(10);
+
 }
