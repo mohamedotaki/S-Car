@@ -9,7 +9,7 @@
     android:background="@color/main">
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/DriversButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="80dp"
@@ -33,7 +33,7 @@
         android:textColor="@color/Black"
         android:textSize="20dp"
         app:layout_constraintBottom_toTopOf="@+id/carImage"
-        app:layout_constraintEnd_toStartOf="@+id/button"
+        app:layout_constraintEnd_toStartOf="@+id/DriversButton"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
@@ -76,7 +76,7 @@
         android:textSize="20dp"
         app:layout_constraintBottom_toTopOf="@+id/carImage"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/button" />
+        app:layout_constraintStart_toEndOf="@+id/DriversButton" />
 
     <Button
         android:layout_width="wrap_content"

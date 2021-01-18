@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -24,9 +25,13 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -39,7 +44,7 @@ public class StartupActivity extends AppCompatActivity {
     Button register, login;
     EditText password,email;
     CheckBox rememberLogin;
-    ConnectionToServer connection = new ConnectionToServer();
+    ConnectionToServer connection ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,19 +62,21 @@ public class StartupActivity extends AppCompatActivity {
 
         VerifyPermissions();
         checkIfLoggedIn();
-       ConnectionToServer.login();
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(!email.getText().toString().isEmpty() && !password.getText().toString().isEmpty() ){
+                   new verifyLogin().execute(email.getText().toString(),password.getText().toString());
                     Intent intent = new Intent(getApplicationContext(),HomeActivity.class);
                     startActivity(intent);
+                    email.getText().clear();
+                    password.getText().clear();
+                    finish();
 
                 }else{
                     Toast.makeText(StartupActivity.this,"Email & Password can't be empty",Toast.LENGTH_SHORT).show();
                 }
 
-                   // connection.login();
 
             }
         });
@@ -112,7 +119,7 @@ public class StartupActivity extends AppCompatActivity {
                     InputStream is = null;
                     String result=null;
                     String line = null;
-                    URL url = new URL("http://localhost:8080/S_Car_Server_war_exploded/" + "Login");
+                    URL url = new URL("http://192.168.1.5/S_Car_Server_war_exploded/" + "Login");
                     HttpURLConnection con = (HttpURLConnection) url.openConnection();
                     con.setDoInput(true);
                     con.setRequestMethod("GET");
@@ -159,5 +166,46 @@ public class StartupActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         VerifyPermissions();
+    }
+
+    static class verifyLogin extends AsyncTask<String , Void ,Boolean>{
+
+        @Override
+        protected Boolean doInBackground(String... strings) {
+
+            String email = strings[0];
+            String pass = strings[1];
+            try {
+                ObjectOutputStream os = null;
+                ObjectInputStream ois = null;
+                Boolean result= false;
+                String line = null;
+                URL url = new URL("http://192.168.1.5:8080/S_Car_Server_war_exploded/" + "Login");
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                con.setDoOutput(true);
+                con.setDoInput(true);
+                con.setUseCaches(false);
+                con.setDefaultUseCaches(false);
+                // Specify the content type that we will send binary data
+                con.setRequestProperty("Content-Type", "application/octet-stream");
+
+                os = new ObjectOutputStream(con.getOutputStream());
+                os.writeObject(email);
+                os.writeObject(pass);
+                os.flush();
+                os.close();
+
+                ois = new ObjectInputStream(con.getInputStream());
+                result = ois.readBoolean();
+                System.out.println(result);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+
+            return null;
+        }
     }
 }

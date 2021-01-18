@@ -4,9 +4,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
+import java.sql.*;
 
 
 @WebServlet(name = "Login", urlPatterns = {"/Login"})
@@ -14,8 +12,7 @@ public class Login extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
          
-         boolean result = false;
-         System.out.println("Conn");
+         ResultSet result;
          response.setContentType("application/octet-stream");
          InputStream in = request.getInputStream();
          ObjectInputStream ois = new ObjectInputStream(in);
@@ -23,18 +20,16 @@ public class Login extends HttpServlet {
          ObjectOutputStream oos = new ObjectOutputStream(outstr);
 
          try {
-            String s = ois.toString();
-            System.out.println(s);
+            String email = ois.readObject().toString();
+             String pass = ois.readObject().toString();
            
-            if(s != null) {
+            if(!email.isEmpty() && !pass.isEmpty()) {
                 Class.forName( "com.mysql.cj.jdbc.Driver" );
                 Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar","root","root" );
-                  
-                PreparedStatement add = con.prepareStatement("SELECT email , password , carNo FROM login where email like ?");
-
-               // result  = add.executeUpdate();
-
-                add.close();
+                Statement statement = con.createStatement();
+                result = statement.executeQuery("SELECT id, email , password , carNo FROM login where email like '"+email+"' and password like '"+pass+"'");
+                result.next();
+                System.out.println(result.getString("carNo"));
                 con.close();
             }
         } 
@@ -42,7 +37,10 @@ public class Login extends HttpServlet {
           System.out.println(ex.toString());
         }
         finally {
-          oos.write(20);
+          /*   if(result>0){
+                 oos.writeBoolean(true);
+             }else oos.writeBoolean(false);
+*/
           oos.flush();
           oos.close();
         }

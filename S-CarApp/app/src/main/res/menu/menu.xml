@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/addNewDriverButton"
+        android:icon="@drawable/add_icon"
+        android:title="Add New Driver"
+        app:showAsAction="always"
+        />
+    <item android:id="@+id/logoutButton"
+        android:icon="@drawable/logout_icon"
+        android:title="Logout"
+        app:showAsAction="always"
+        />
+</menu>

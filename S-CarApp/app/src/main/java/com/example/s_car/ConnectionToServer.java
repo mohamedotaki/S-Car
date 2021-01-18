@@ -14,36 +14,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class ConnectionToServer {
-
-    public static void login() {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-                try {
-                    InputStream is = null;
-                    String result=null;
-                    String line = null;
-                    URL url = new URL("http://localhost:8080/S_Car_Server_war_exploded/" + "Login");
-                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                    con.setDoInput(true);
-                    con.setRequestMethod("GET");
-                    is = new BufferedInputStream(con.getInputStream());
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
-                    StringBuilder stringBuilder = new StringBuilder();
-                    while ((line = bufferedReader.readLine()) != null) {
-                        stringBuilder.append(line + "\n");
-                    }
-                    is.close();
-
-
-                    result = stringBuilder.toString();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-        }.execute();
+public class ConnectionToServer extends AsyncTask <String , Void , String> {
+    @Override
+    protected String doInBackground(String... strings) {
+        return null;
     }
 }
+
+

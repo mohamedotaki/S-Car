@@ -89,7 +89,7 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(View v) {
                if (blueAdapter.enable()){
                    try {
-                       Thread.sleep(150);
+                       Thread.sleep(200);
                    } catch (InterruptedException e) {
                        e.printStackTrace();
                    }

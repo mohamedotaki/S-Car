@@ -8,66 +8,79 @@
     android:background="@color/main">
 
     <EditText
-        android:id="@+id/editText3"
+        android:id="@+id/nameEditTextRegister"
         android:layout_width="300dp"
         android:layout_height="75dp"
-        android:layout_marginTop="144dp"
+        android:layout_marginTop="84dp"
+        android:hint="Full Name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:hint="First Name"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/editText4"
+        android:id="@+id/phoneNumberEditTextRegister"
         android:layout_width="300dp"
         android:layout_height="75dp"
+        android:hint="Phone Number"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText3"
-        android:hint="Last Name"/>
+        app:layout_constraintTop_toBottomOf="@+id/EmailAddressEditTextRegister" />
 
     <EditText
-        android:id="@+id/editText5"
+        android:id="@+id/conformPasswordEditTextRegister"
         android:layout_width="300dp"
         android:layout_height="75dp"
+        android:hint="Conform Password"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText4"
-        android:hint="Email Address"/>
-
-    <EditText
-        android:id="@+id/editText6"
-        android:layout_width="300dp"
-        android:layout_height="75dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText5"
-        android:hint="Password"/>
-
-    <EditText
-        android:id="@+id/editText7"
-        android:layout_width="300dp"
-        android:layout_height="75dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText6"
-        android:hint="Conform Password"/>
-
-
-
-
+        app:layout_constraintTop_toBottomOf="@+id/passwordEditTextRegister" />
 
     <Button
+        android:id="@+id/registerButtonRegister"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
         android:background="@drawable/round_button"
         android:text="Register"
         android:textColor="@color/Black"
         android:textSize="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.504"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText7" />
+        app:layout_constraintTop_toBottomOf="@+id/conformPasswordEditTextRegister" />
+
+    <EditText
+        android:id="@+id/passwordEditTextRegister"
+        android:layout_width="300dp"
+        android:layout_height="75dp"
+        android:hint="Password"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/carNumberEditTextRegister" />
+
+    <EditText
+        android:id="@+id/EmailAddressEditTextRegister"
+        android:layout_width="300dp"
+        android:layout_height="75dp"
+        android:hint="Email Address"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nameEditTextRegister" />
+
+    <EditText
+        android:id="@+id/carNumberEditTextRegister"
+        android:layout_width="300dp"
+        android:layout_height="75dp"
+        android:hint="Car Number"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/phoneNumberEditTextRegister" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

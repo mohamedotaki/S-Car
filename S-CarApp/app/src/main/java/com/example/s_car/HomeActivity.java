@@ -1,9 +1,8 @@
 package com.example.s_car;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -12,33 +11,47 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.ParcelUuid;
-import android.provider.ContactsContract;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.s_car.Local_Database.Local_Database;
+
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Set;
 
 public class HomeActivity extends AppCompatActivity {
-    Button controlButton, settingsButton;
+    Button controlButton, settingsButton,driversButton;
     OutputStream outputStream;
     BluetoothSocket bluetoothSocket;
+    public static Local_Database database;
+    SharedPreferences sharedPreferences;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         controlButton = (Button)findViewById(R.id.controlButton);
         settingsButton = (Button)findViewById(R.id.settingsButton);
+        driversButton = (Button)findViewById(R.id.DriversButton);
+
+        sharedPreferences = getSharedPreferences("settings", MODE_PRIVATE);
+
+
+
+         // database = Room.databaseBuilder(getApplicationContext(), Local_Database.class,"S_Car_Database").build();
+        //new GetData().execute();
 
         try {
             availableBluetooth();
         } catch (Exception e) {
-            e.printStackTrace();
+            Toast.makeText(HomeActivity.this, "Not Connected to Car", Toast.LENGTH_SHORT).show();
         }
+
+        ///////Buttons on click listener
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -51,11 +64,37 @@ public class HomeActivity extends AppCompatActivity {
                     goTo(ControlCar.class);
             }
         });
+        driversButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { goTo(DriversActivity.class);
+            }
+        });
+
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu, menu);
+        menu.removeItem(R.id.addNewDriverButton);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.logoutButton:
+                sharedPreferences.edit().putBoolean("LoggedIn",false);
+                finish();
+                goTo(StartupActivity.class);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     void availableBluetooth() throws Exception {
         BluetoothAdapter blueAdapter = BluetoothAdapter.getDefaultAdapter();
-        SharedPreferences sharedPreferences = getSharedPreferences("settings", MODE_PRIVATE);
         String bluetoothDeviceName = sharedPreferences.getString("bluetoothDeviceName", "noName");
         if(!bluetoothDeviceName.equalsIgnoreCase("noName")) {
             if (blueAdapter != null) {
@@ -70,8 +109,6 @@ public class HomeActivity extends AppCompatActivity {
                             if (bluetoothSocket.isConnected()) {
                                 Toast.makeText(HomeActivity.this, "Connected to Car", Toast.LENGTH_SHORT).show();
                                 outputStream = bluetoothSocket.getOutputStream();
-                            } else {
-                                Toast.makeText(HomeActivity.this, "Not Connected to Car", Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
