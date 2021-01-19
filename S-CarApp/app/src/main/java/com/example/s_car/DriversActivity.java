@@ -1,5 +1,6 @@
 package com.example.s_car;
 
+import android.content.Intent;
 import android.icu.text.CaseMap;
 import android.os.Bundle;
 
@@ -54,7 +55,8 @@ public class DriversActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.addNewDriverButton:
-
+                Intent intent = new Intent(getApplicationContext(),AddDriversActivity.class);
+                startActivity(intent);
                 return true;
         }
         return super.onOptionsItemSelected(item);

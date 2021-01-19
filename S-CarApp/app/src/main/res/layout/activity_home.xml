@@ -84,7 +84,7 @@
         android:layout_marginTop="24dp"
         android:background="@color/main"
         android:outlineProvider="none"
-        android:text="Empty"
+        android:text="Activity Log"
         android:textColor="@color/Black"
         android:textSize="20dp"
         app:layout_constraintEnd_toEndOf="parent"

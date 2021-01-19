@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AddDriversActivity"
+    android:background="@color/main">
+
+    <EditText
+        android:id="@+id/nameEditTextAddDriver"
+        android:layout_width="300dp"
+        android:layout_height="75dp"
+        android:layout_marginTop="128dp"
+        android:hint="Full Name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/emailAddressEditTextAddDriver"
+        android:layout_width="300dp"
+        android:layout_height="75dp"
+        android:hint="Email Address"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nameEditTextAddDriver" />
+    <EditText
+        android:id="@+id/phoneNumberEditTextAddDriver"
+        android:layout_width="300dp"
+        android:layout_height="75dp"
+        android:hint="Phone Number"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/emailAddressEditTextAddDriver" />
+
+    <Spinner
+        android:id="@+id/adminSpinnerAddDriver"
+        android:layout_width="300dp"
+        android:layout_height="75dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/phoneNumberEditTextAddDriver" />
+
+    <TextView
+        android:id="@+id/dateTextViewAddDriver"
+        android:layout_width="250dp"
+        android:layout_height="75dp"
+        android:gravity="center_vertical"
+        android:hint="Date"
+        android:textSize="20dp"
+        app:layout_constraintEnd_toStartOf="@+id/dateImageButtonAddDriver"
+        app:layout_constraintTop_toBottomOf="@+id/adminSpinnerAddDriver" />
+
+    <ImageButton
+        android:id="@+id/dateImageButtonAddDriver"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="13dp"
+        android:layout_marginEnd="56dp"
+        android:layout_marginRight="56dp"
+        android:src="@drawable/time_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@color/main"
+        app:layout_constraintTop_toBottomOf="@+id/adminSpinnerAddDriver" />
+
+
+    <Button
+        android:id="@+id/addDriverButtonAddDriver"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="64dp"
+        android:background="@drawable/round_button"
+        android:text="Add Driver"
+        android:textColor="@color/Black"
+        android:textSize="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.504"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dateTextViewAddDriver" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

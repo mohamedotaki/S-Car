@@ -46,7 +46,7 @@ public class HomeActivity extends AppCompatActivity {
         //new GetData().execute();
 
         try {
-            availableBluetooth();
+          //  availableBluetooth();
         } catch (Exception e) {
             Toast.makeText(HomeActivity.this, "Not Connected to Car", Toast.LENGTH_SHORT).show();
         }
