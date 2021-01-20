@@ -67,8 +67,7 @@ public class StartupActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(!email.getText().toString().isEmpty() && !password.getText().toString().isEmpty() ){
                    new verifyLogin().execute(email.getText().toString(),password.getText().toString());
-                    Intent intent = new Intent(getApplicationContext(),HomeActivity.class);
-                    startActivity(intent);
+                    goTo(HomeActivity.class);
                     email.getText().clear();
                     password.getText().clear();
                     finish();
@@ -83,14 +82,20 @@ public class StartupActivity extends AppCompatActivity {
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(),Register.class);
-                startActivity(intent);
+                goTo(Register.class);
             }
         });
 
 
 
 
+
+    }
+    private void goTo(Class activity){
+        try {
+            Intent intent = new Intent(getApplicationContext(),activity);
+            startActivity(intent);
+        }catch (Exception e){}
 
     }
     public void Animation(ImageView image){
@@ -174,7 +179,6 @@ public class StartupActivity extends AppCompatActivity {
         protected Boolean doInBackground(String... strings) {
 
             String email = strings[0];
-            String pass = strings[1];
             try {
                 ObjectOutputStream os = null;
                 ObjectInputStream ois = null;
@@ -191,7 +195,6 @@ public class StartupActivity extends AppCompatActivity {
 
                 os = new ObjectOutputStream(con.getOutputStream());
                 os.writeObject(email);
-                os.writeObject(pass);
                 os.flush();
                 os.close();
 

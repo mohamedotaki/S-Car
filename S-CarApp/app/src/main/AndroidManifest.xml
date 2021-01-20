@@ -21,9 +21,7 @@
 
 
         <activity
-            android:name=".AddDriversActivity"
-            android:label="@string/title_activity_add_drivers"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:name=".AddDriversActivity"/>
         <activity android:name=".SettingsActivity" />
         <activity android:name=".DriversActivity" />
         <activity android:name=".ControlCar" />

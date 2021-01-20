@@ -20,6 +20,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -29,6 +31,7 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
     TextView date;
     ImageButton openDateButton;
     int year , month , day;
+    Calendar calendar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,11 +49,9 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
         openDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Calendar calendar = Calendar.getInstance();
-                year = calendar.get(Calendar.YEAR);
-                month = calendar.get(Calendar.MONTH);
-                day = calendar.get(Calendar.DAY_OF_MONTH);
-                DatePickerDialog datePickerDialog = new DatePickerDialog(AddDriversActivity.this, AddDriversActivity.this,year, month,day);
+                calendar = Calendar.getInstance();
+                DatePickerDialog datePickerDialog = new DatePickerDialog(AddDriversActivity.this, AddDriversActivity.this,
+                        calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),calendar.get(Calendar.DAY_OF_MONTH));
                 datePickerDialog.show();
             }
         });
@@ -86,13 +87,20 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        Date datePicked = new Date(year,month,dayOfMonth);
-        Date currentDate = new Date(Calendar.YEAR,Calendar.MONTH,Calendar.DAY_OF_MONTH);
-        if(currentDate.after(datePicked)){
-            Toast.makeText(AddDriversActivity.this, "Please Pick Date in Future", Toast.LENGTH_SHORT).show();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date currentDate = Calendar.getInstance().getTime();
+        calendar.set(year,month,dayOfMonth);
+        Date datePicked = calendar.getTime();
+
+        if(currentDate.after(datePicked)) {
+            Toast.makeText(AddDriversActivity.this, "Please Pick Date in the Future", Toast.LENGTH_SHORT).show();
+        }else{
+            String datePickedFormat = dateFormat.format(datePicked);
+            date.setText(datePickedFormat );
         }
-        Toast.makeText(AddDriversActivity.this, currentDate+"", Toast.LENGTH_SHORT).show();
-        date.setText(year +"/"+ month +"/"+ dayOfMonth );
+
+
+
 
     }
 

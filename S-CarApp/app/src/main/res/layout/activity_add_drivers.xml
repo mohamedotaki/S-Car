@@ -40,12 +40,14 @@
 
     <Spinner
         android:id="@+id/adminSpinnerAddDriver"
+        android:background="@drawable/round_spinner"
         android:layout_width="300dp"
-        android:layout_height="75dp"
+        android:layout_height="50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/phoneNumberEditTextAddDriver" />
+
 
     <TextView
         android:id="@+id/dateTextViewAddDriver"
@@ -54,21 +56,24 @@
         android:gravity="center_vertical"
         android:hint="Date"
         android:textSize="20dp"
-        app:layout_constraintEnd_toStartOf="@+id/dateImageButtonAddDriver"
+        android:textColor="@color/Black"
+        app:layout_constraintEnd_toEndOf="@+id/dateImageButtonAddDriver"
+        app:layout_constraintHorizontal_bias="0.541"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/adminSpinnerAddDriver" />
 
     <ImageButton
         android:id="@+id/dateImageButtonAddDriver"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginTop="13dp"
-        android:layout_marginEnd="56dp"
-        android:layout_marginRight="56dp"
-        android:src="@drawable/time_icon"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="52dp"
+        android:layout_marginRight="52dp"
         android:background="@color/main"
-        app:layout_constraintTop_toBottomOf="@+id/adminSpinnerAddDriver" />
-
+        android:src="@drawable/time_icon"
+        app:layout_constraintBottom_toBottomOf="@+id/dateTextViewAddDriver"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/adminSpinnerAddDriver"
+        app:layout_constraintVertical_bias="0.32" />
 
     <Button
         android:id="@+id/addDriverButtonAddDriver"
