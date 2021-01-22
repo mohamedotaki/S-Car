@@ -1,5 +1,6 @@
-import com.example.s_car.Owner;
 
+
+import com.example.s_car.User;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -23,45 +24,49 @@ public class Register extends HttpServlet {
          ObjectOutputStream oos = new ObjectOutputStream(outstr);
 
          try {
-             Owner owner = (Owner) ois.readObject();
-            if(owner != null) {
+             User user = (User) ois.readObject();
+            if(user != null) {
                 Class.forName( "com.mysql.cj.jdbc.Driver" );
                 Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar","root","root" );
-                PreparedStatement checkOwner = con.prepareStatement("SELECT count(*) FROM owners , login where carNumber like ? or email like ?");
-                checkOwner.setNString(1,owner.getCarNumber());
-                checkOwner.setNString(2,owner.getEmailAddress());
+                PreparedStatement checkOwner = con.prepareStatement("SELECT count(*) FROM drivers , login where carNumber like ? or email like ?");
+                checkOwner.setNString(1, user.getCarNumber());
+                checkOwner.setNString(2, user.getEmailAddress());
                 resultSet = checkOwner.executeQuery();
+
                 resultSet.next();
                 if(resultSet.getInt(1) <= 0) {
                     checkOwner.close();
-                    PreparedStatement addOwner = con.prepareStatement("INSERT INTO owners VALUE (?,?,?,?,?)");
-                    addOwner.setInt(1, owner.getId());
-                    addOwner.setNString(2, owner.getName());
-                    addOwner.setNString(3, owner.getPhoneNumber());
-                    addOwner.setNString(4, owner.getCarNumber());
-                    addOwner.setNString(5, owner.getCarKey());
-                    result = addOwner.executeUpdate();
-                    addOwner.close();
+                    PreparedStatement addOwnerLogin = con.prepareStatement("INSERT INTO login VALUE (null ,?,?)");
+                    addOwnerLogin.setNString(1, user.getEmailAddress());
+                    addOwnerLogin.setNString(2, user.getPassword());
+                    result = addOwnerLogin.executeUpdate();
+                    addOwnerLogin.close();
+
                     if (result > 0) {
                         result = 0;
-                        PreparedStatement getOwnerId = con.prepareStatement("SELECT ownerId FROM owners WHERE carNumber like ?");
-                        getOwnerId.setNString(1, owner.getCarNumber());
+                        PreparedStatement getOwnerId = con.prepareStatement("SELECT loginId FROM login WHERE email like ?");
+                        getOwnerId.setNString(1, user.getEmailAddress());
                         resultSet = getOwnerId.executeQuery();
                         resultSet.next();
-
-                        owner.setId(resultSet.getInt("ownerId"));
+                        int loginID = resultSet.getInt("loginId");
+                        System.out.println(loginID);
                         getOwnerId.close();
-                        if(owner.getId() !=0){
-                            PreparedStatement addOwnerLogin = con.prepareStatement("INSERT INTO login VALUE (NULL,?,?,?)");
-                            addOwnerLogin.setInt(1, owner.getId());
-                            addOwnerLogin.setNString(2, owner.getEmailAddress());
-                            addOwnerLogin.setNString(3, owner.getPassword());
-                            result = addOwnerLogin.executeUpdate();
-                            addOwnerLogin.close();
+                        if(loginID !=0){
+                            PreparedStatement addOwner = con.prepareStatement("INSERT INTO drivers VALUE (null,?,?,?,?,?,?,?)");
+                            addOwner.setInt(1, loginID);
+                            addOwner.setNString(2, user.getName());
+                            addOwner.setNString(3, user.getPhoneNumber());
+                            addOwner.setNString(4, user.getCarNumber());
+                            addOwner.setNString(5, user.getCarKey());
+                            addOwner.setBoolean(6, user.isOwner());
+                            addOwner.setDate(7, (Date) user.getDrivingPermission());
+                            result = addOwner.executeUpdate();
+
+                            addOwner.close();
                             err = "registered";
                         }else{
-                            PreparedStatement delete = con.prepareStatement("DELETE FROM owner where ownerId like ?");
-                            delete.setInt(1, owner.getId());
+                            PreparedStatement delete = con.prepareStatement("DELETE FROM login where email like ?");
+                            delete.setNString(1, user.getEmailAddress());
                             result = delete.executeUpdate();
                             delete.close();
                             err = "Please try again later";
@@ -73,7 +78,7 @@ public class Register extends HttpServlet {
                     }
                 }else{
                     //owner has been added before email or car no
-                    err = "Email or Car Number is been used by someone else";
+                    err = "Email or Car Number is been used by different account";
                     checkOwner.close();
                 }
 

@@ -6,16 +6,13 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -25,13 +22,11 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -40,11 +35,12 @@ public class StartupActivity extends AppCompatActivity {
     private static final int per=1;
     private static final String TAG = "StartupActivity";
     ImageView coverImage , carImage;
-    long time = 5000;
+    long time = 4000;
     Button register, login;
     EditText password,email;
     CheckBox rememberLogin;
     ConnectionToServer connection ;
+    public static User oo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,10 +63,9 @@ public class StartupActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(!email.getText().toString().isEmpty() && !password.getText().toString().isEmpty() ){
                    new verifyLogin().execute(email.getText().toString(),password.getText().toString());
-                    goTo(HomeActivity.class);
                     email.getText().clear();
                     password.getText().clear();
-                    finish();
+
 
                 }else{
                     Toast.makeText(StartupActivity.this,"Email & Password can't be empty",Toast.LENGTH_SHORT).show();
@@ -92,11 +87,8 @@ public class StartupActivity extends AppCompatActivity {
 
     }
     private void goTo(Class activity){
-        try {
             Intent intent = new Intent(getApplicationContext(),activity);
             startActivity(intent);
-        }catch (Exception e){}
-
     }
     public void Animation(ImageView image){
         ObjectAnimator animator = ObjectAnimator.ofFloat(image,"x",1000f);
@@ -173,16 +165,16 @@ public class StartupActivity extends AppCompatActivity {
         VerifyPermissions();
     }
 
-    static class verifyLogin extends AsyncTask<String , Void ,Boolean>{
+    class verifyLogin extends AsyncTask<String , Void ,User>{
 
         @Override
-        protected Boolean doInBackground(String... strings) {
+        protected User doInBackground(String... strings) {
 
             String email = strings[0];
+            String pass = strings[1];
             try {
                 ObjectOutputStream os = null;
                 ObjectInputStream ois = null;
-                Boolean result= false;
                 String line = null;
                 URL url = new URL("http://192.168.1.5:8080/S_Car_Server_war_exploded/" + "Login");
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -194,21 +186,28 @@ public class StartupActivity extends AppCompatActivity {
                 con.setRequestProperty("Content-Type", "application/octet-stream");
 
                 os = new ObjectOutputStream(con.getOutputStream());
-                os.writeObject(email);
+                os.writeObject(Encryption.encrypt(email));
+                os.writeObject(Encryption.encrypt(pass));
                 os.flush();
                 os.close();
 
                 ois = new ObjectInputStream(con.getInputStream());
-                result = ois.readBoolean();
-                System.out.println(result);
-
+                oo = (User) ois.readObject();
+                return oo;
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-
-
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(User user) {
+            if(user != null){
+                goTo(HomeActivity.class);
+                finish();
+            }else{
+                Toast.makeText(StartupActivity.this, "Wrong Email or Password", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

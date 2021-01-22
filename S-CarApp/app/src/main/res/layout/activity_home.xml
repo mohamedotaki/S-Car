@@ -8,6 +8,31 @@
     tools:context=".HomeActivity"
     android:background="@color/main">
 
+    <TextView
+        android:id="@+id/accountTypeTextViewHome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="36dp"
+        android:layout_marginLeft="36dp"
+        android:layout_marginTop="16dp"
+        android:text="PreTime"
+        android:textColor="@color/Black"
+        android:textSize="25dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/timeLeftTextViewHome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="36dp"
+        android:layout_marginLeft="36dp"
+        android:text="PreTime"
+        android:textColor="@color/Black"
+        android:textSize="25dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/accountTypeTextViewHome" />
+
     <Button
         android:id="@+id/DriversButton"
         android:layout_width="wrap_content"

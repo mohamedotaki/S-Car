@@ -13,6 +13,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Date;
 
 public class Register extends AppCompatActivity {
 
@@ -31,9 +32,6 @@ public class Register extends AppCompatActivity {
         carNumber = (EditText) findViewById(R.id.carNumberEditTextRegister);
         emailAddress = (EditText) findViewById(R.id.EmailAddressEditTextRegister);
         phoneNumber = (EditText) findViewById(R.id.phoneNumberEditTextRegister);
-
-
-
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -41,10 +39,9 @@ public class Register extends AppCompatActivity {
                 && !carNumber.getText().toString().isEmpty() && !emailAddress.getText().toString().isEmpty() &&!phoneNumber.getText().toString().isEmpty()){
                     if(password.getText().toString().equals(conformPassword.getText().toString())){
                         try {
-                            Owner owner = new Owner(getEncryptedText(name), getEncryptedText(emailAddress), getEncryptedText(phoneNumber),
+                            User user = new User(getEncryptedText(name), getEncryptedText(emailAddress), getEncryptedText(phoneNumber),
                                     getEncryptedText(carNumber), getEncryptedText(password));
-                             new registerUser().execute(owner);
-                            Toast.makeText(Register.this, result, Toast.LENGTH_SHORT).show();
+                             new registerUser().execute(user);
                         }catch (Exception e){ }
                     }else{
                         Toast.makeText(Register.this, "The passwords don't match", Toast.LENGTH_SHORT).show();
@@ -56,11 +53,13 @@ public class Register extends AppCompatActivity {
         });
     }
 
-    static class registerUser extends AsyncTask<Owner, Void, Void> {
+    class registerUser extends AsyncTask<User, Void, String> {
 
         @Override
-        protected Void doInBackground(Owner... owners) {
-            Owner owner = owners[0];
+        protected String doInBackground(User... users) {
+            User user = users[0];
+            user.setOwner(true);
+            user.setDrivingPermission(null);
             try {
                 ObjectInputStream ois = null;
                 URL url = new URL("http://192.168.1.5:8080/S_Car_Server_war_exploded/" + "Register");
@@ -73,18 +72,27 @@ public class Register extends AppCompatActivity {
                 con.setRequestProperty("Content-Type", "application/octet-stream");
 
                 ObjectOutputStream oos = new ObjectOutputStream(con.getOutputStream());
-                oos.writeObject(owner);
+                oos.writeObject(user);
                 oos.flush();
                 ois = new ObjectInputStream(con.getInputStream());
 
 
                 result = ois.readObject().toString();
                 oos.close();
-
+                return result;
             } catch (Exception e) {
                 e.printStackTrace();
             }
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Toast.makeText(Register.this, s, Toast.LENGTH_SHORT).show();
+            if (s.equalsIgnoreCase("registered")){
+                finish();
+            }
         }
     }
 

@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.s_car.Local_Database.Local_Database;
@@ -27,6 +28,7 @@ import java.util.Set;
 public class HomeActivity extends AppCompatActivity {
     Button controlButton, settingsButton,driversButton;
     OutputStream outputStream;
+    TextView timeLeft,accountType;
     BluetoothSocket bluetoothSocket;
     public static Local_Database database;
     SharedPreferences sharedPreferences;
@@ -37,10 +39,15 @@ public class HomeActivity extends AppCompatActivity {
         controlButton = (Button)findViewById(R.id.controlButton);
         settingsButton = (Button)findViewById(R.id.settingsButton);
         driversButton = (Button)findViewById(R.id.DriversButton);
+        accountType = (TextView)findViewById(R.id.accountTypeTextViewHome);
+        timeLeft = (TextView)findViewById(R.id.timeLeftTextViewHome);
 
         sharedPreferences = getSharedPreferences("settings", MODE_PRIVATE);
 
-
+        if(StartupActivity.oo.isOwner){
+            accountType.setText("Owner");
+            timeLeft.setVisibility(View.GONE);
+        }
 
          // database = Room.databaseBuilder(getApplicationContext(), Local_Database.class,"S_Car_Database").build();
         //new GetData().execute();

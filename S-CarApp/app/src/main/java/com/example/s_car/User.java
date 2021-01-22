@@ -1,8 +1,9 @@
 package com.example.s_car;
 
 import java.io.Serializable;
+import java.util.Date;
 
-public class Owner implements Serializable {
+public class User implements Serializable {
     private static final long serialVersionUID = 6529685098267757690L;
     int id = 0;
     String name ="";
@@ -11,11 +12,14 @@ public class Owner implements Serializable {
     String carNumber = "";
     String password = "";
     String carKey ="";
+    boolean isOwner = false;
+    Date drivingPermission = null;
 
-    public Owner() {
+
+    public User() {
     }
 
-    public Owner(String name, String emailAddress, String phoneNumber, String carNumber, String password) {
+    public User(String name, String emailAddress, String phoneNumber, String carNumber, String password) {
         this.name = name;
         this.emailAddress = emailAddress;
         this.phoneNumber = phoneNumber;
@@ -23,18 +27,18 @@ public class Owner implements Serializable {
         this.password = password;
     }
 
-    @Override
-    public String toString() {
-        return "Owner{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", emailAddress='" + emailAddress + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", carNumber='" + carNumber + '\'' +
-                ", password='" + password + '\'' +
-                ", carKey='" + carKey + '\'' +
-                '}';
+    public User(int id, String name, String emailAddress, String phoneNumber, String carNumber, String password, String carKey, boolean isOwner, Date drivingPermission) {
+        this.id = id;
+        this.name = name;
+        this.emailAddress = emailAddress;
+        this.phoneNumber = phoneNumber;
+        this.carNumber = carNumber;
+        this.password = password;
+        this.carKey = carKey;
+        this.isOwner = isOwner;
+        this.drivingPermission = drivingPermission;
     }
+
 
     public int getId() {
         return id;
@@ -90,5 +94,21 @@ public class Owner implements Serializable {
 
     public void setCarKey(String carKey) {
         this.carKey = carKey;
+    }
+
+    public boolean isOwner() {
+        return isOwner;
+    }
+
+    public void setOwner(boolean owner) {
+        isOwner = owner;
+    }
+
+    public Date getDrivingPermission() {
+        return drivingPermission;
+    }
+
+    public void setDrivingPermission(Date drivingPermission) {
+        this.drivingPermission = drivingPermission;
     }
 }
