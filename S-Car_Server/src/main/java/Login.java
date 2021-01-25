@@ -52,7 +52,7 @@ public class Login extends HttpServlet {
                     resultSet.next();
                     User user = new User(resultSet.getInt(1),resultSet.getString(2),email,resultSet.getString(3),
                             resultSet.getString(4),pass,resultSet.getString(5),resultSet.getBoolean(6),
-                            resultSet.getDate(7));
+                            resultSet.getString(7));
                     System.out.println("sss");
                     oos.writeObject(user);
                     System.out.println("sent");

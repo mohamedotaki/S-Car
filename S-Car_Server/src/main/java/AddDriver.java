@@ -5,10 +5,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -31,7 +28,7 @@ public class AddDriver extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        int result = 0;
+        String mess = null;
         response.setContentType("application/octet-stream");
         InputStream in = request.getInputStream();
         ObjectInputStream ois = new ObjectInputStream(in);
@@ -44,16 +41,36 @@ public class AddDriver extends HttpServlet {
             if(user != null) {
                 Class.forName( "com.mysql.cj.jdbc.Driver" );
                 Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar","root","root" );
-
-                PreparedStatement addToDriver = con.prepareStatement("Insert Into login  Values (null,?,?)");
-                addToDriver.setNString(1,user.getEmailAddress());
-                addToDriver.setNString(2,"123456789");
-                int rs =addToDriver.executeUpdate();
-
-                System.out.println(rs);
-              //  result  = add.executeUpdate();
-
-                addToDriver.close();
+                PreparedStatement addToLogin = con.prepareStatement("Insert Into login  Values (null,?,?)", Statement.RETURN_GENERATED_KEYS);
+                addToLogin.setNString(1,user.getEmailAddress());
+                addToLogin.setNString(2,"123456789");
+                int rs = addToLogin.executeUpdate();
+                ResultSet resultSet = addToLogin.getGeneratedKeys();
+                int loginID = 0;
+                if(resultSet.next() && rs >0){
+                    rs =0;
+                    loginID = resultSet.getInt(1);
+                    PreparedStatement addToDriver = con.prepareStatement("Insert Into drivers  Values (null,?,?,?,?,?,?,?)");
+                    addToDriver.setInt(1,loginID);
+                    addToDriver.setNString(2,user.getName());
+                    addToDriver.setNString(3,user.getPhoneNumber());
+                    addToDriver.setNString(4,user.getCarNumber());
+                    addToDriver.setNString(5,user.getCarKey());
+                    addToDriver.setBoolean(6,user.isOwner());
+                    addToDriver.setNString(7,user.getDrivingPermission());
+                    rs = addToDriver.executeUpdate();
+                    addToDriver.close();
+                    if(rs >0){
+                       mess = "Driver was added";
+                    }else{
+                        PreparedStatement delete = con.prepareStatement("DELETE FROM login  where loginId like ?");
+                        delete.setInt(1,loginID);
+                        mess = "Nothing was added";
+                    }
+                }else{
+                    mess = "Nothing was added";
+                }
+                addToLogin.close();
                 con.close();
             }
         }
@@ -61,7 +78,7 @@ public class AddDriver extends HttpServlet {
             System.out.println(ex.toString());
         }
         finally {
-            oos.writeInt(result);
+            oos.writeObject(mess);
             oos.flush();
             oos.close();
         }

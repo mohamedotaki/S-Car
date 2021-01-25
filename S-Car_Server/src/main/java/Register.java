@@ -59,7 +59,7 @@ public class Register extends HttpServlet {
                             addOwner.setNString(4, user.getCarNumber());
                             addOwner.setNString(5, user.getCarKey());
                             addOwner.setBoolean(6, user.isOwner());
-                            addOwner.setDate(7, (Date) user.getDrivingPermission());
+                            addOwner.setNString(7, user.getDrivingPermission());
                             result = addOwner.executeUpdate();
 
                             addOwner.close();

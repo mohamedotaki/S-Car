@@ -38,7 +38,8 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
     ImageButton openDateButton;
     Calendar calendar;
     Button addDriverButton;
-    User driver  = new User();
+    User driver = new User() ;
+    String datePicked = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,21 +68,23 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
         addDriverButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!name.getText().toString().isEmpty() && !emailAddress.getText().toString().isEmpty()&&!phoneNumber.getText().toString().isEmpty()
-            && !date.getText().toString().isEmpty()){
+                if(!name.getText().toString().isEmpty() && !emailAddress.getText().toString().isEmpty()&&!phoneNumber.getText().toString().isEmpty()){
                     try {
-                        driver.setDrivingPermission( (Date)date.getText());
+                        if(driverType.getSelectedItem().toString().equalsIgnoreCase("Add Driver Without Time")){
+                            driver.setDrivingPermission(null);
+                        }else{
+                            if(datePicked.isEmpty()) throw new Exception("Empty Date");
+                            driver.setDrivingPermission(datePicked);
+                        }
                         driver.setName(getEncryptedText(name));
                         driver.setOwner(false);
                         driver.setCarKey(StartupActivity.oo.getCarKey());
                         driver.setCarNumber(StartupActivity.oo.carNumber);
                         driver.setEmailAddress(getEncryptedText(emailAddress));
                         driver.setPhoneNumber(getEncryptedText(phoneNumber));
+                        new addDriver().execute(driver);
                     }catch (Exception e){
-
                     }
-                    new addDriver().execute(driver);
-
                 }
             }
         });
@@ -97,7 +100,7 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
         driverType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-              if(driverType.getSelectedItem().toString().equalsIgnoreCase("admin")){
+              if(driverType.getSelectedItem().toString().equalsIgnoreCase("Add Driver Without Time")){
                   openDateButton.setVisibility(View.GONE);
                   date.setVisibility(View.GONE);
               }else {
@@ -129,6 +132,7 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
         }else{
             String datePickedFormat = dateFormat.format(datePicked);
             date.setText(datePickedFormat );
+            this.datePicked = datePickedFormat;
         }
 
 
@@ -169,6 +173,13 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
             return null;
         }
 
+        @Override
+        protected void onPostExecute(String s) {
+            Toast.makeText(AddDriversActivity.this, s, Toast.LENGTH_SHORT).show();
+            if(s.equalsIgnoreCase("Driver was added")){
+                finish();
+            }
+        }
     }
 
 }

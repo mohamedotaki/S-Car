@@ -12,8 +12,8 @@
     <string name="title_activity_add_drivers">AddDriversActivity</string>
 
     <string-array name="add_driver_spinner">
-        <item>Driver</item>
-        <item>Admin</item>
+        <item>Add Driver With Time</item>
+        <item>Add Driver Without Time</item>
     </string-array>
 
 </resources>

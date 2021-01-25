@@ -6,6 +6,7 @@ import java.util.Date;
 public class User implements Serializable {
     private static final long serialVersionUID = 6529685098267757690L;
     int id = 0;
+    int loginID=0;
     String name ="";
     String emailAddress = "";
     String phoneNumber = "";
@@ -13,7 +14,7 @@ public class User implements Serializable {
     String password = "";
     String carKey ="";
     boolean isOwner = false;
-    Date drivingPermission = null;
+    String drivingPermission = null;
 
 
     public User() {
@@ -27,7 +28,7 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public User(int id, String name, String emailAddress, String phoneNumber, String carNumber, String password, String carKey, boolean isOwner, Date drivingPermission) {
+    public User(int id, String name, String emailAddress, String phoneNumber, String carNumber, String password, String carKey, boolean isOwner, String drivingPermission) {
         this.id = id;
         this.name = name;
         this.emailAddress = emailAddress;
@@ -39,6 +40,34 @@ public class User implements Serializable {
         this.drivingPermission = drivingPermission;
     }
 
+    public User(int id, int loginID, String name, String emailAddress, String phoneNumber, String carNumber, String password, String carKey, boolean isOwner, String drivingPermission) {
+        this.id = id;
+        this.loginID = loginID;
+        this.name = name;
+        this.emailAddress = emailAddress;
+        this.phoneNumber = phoneNumber;
+        this.carNumber = carNumber;
+        this.password = password;
+        this.carKey = carKey;
+        this.isOwner = isOwner;
+        this.drivingPermission = drivingPermission;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", loginID=" + loginID +
+                ", name='" + name + '\'' +
+                ", emailAddress='" + emailAddress + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", carNumber='" + carNumber + '\'' +
+                ", password='" + password + '\'' +
+                ", carKey='" + carKey + '\'' +
+                ", isOwner=" + isOwner +
+                ", drivingPermission='" + drivingPermission + '\'' +
+                '}';
+    }
 
     public int getId() {
         return id;
@@ -46,6 +75,14 @@ public class User implements Serializable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getLoginID() {
+        return loginID;
+    }
+
+    public void setLoginID(int loginID) {
+        this.loginID = loginID;
     }
 
     public String getName() {
@@ -104,11 +141,11 @@ public class User implements Serializable {
         isOwner = owner;
     }
 
-    public Date getDrivingPermission() {
+    public String getDrivingPermission() {
         return drivingPermission;
     }
 
-    public void setDrivingPermission(Date drivingPermission) {
+    public void setDrivingPermission(String drivingPermission) {
         this.drivingPermission = drivingPermission;
     }
 }
