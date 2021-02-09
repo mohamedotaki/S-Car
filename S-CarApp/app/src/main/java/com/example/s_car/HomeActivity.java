@@ -23,15 +23,18 @@ import com.example.s_car.Local_Database.Local_Database;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Set;
 
 public class HomeActivity extends AppCompatActivity {
     Button controlButton, settingsButton,driversButton;
     OutputStream outputStream;
-    TextView timeLeft,accountType;
-    BluetoothSocket bluetoothSocket;
-    public static Local_Database database;
+    TextView timeLeft,accountType, userName;
+    public static BluetoothSocket bluetoothSocket;
     SharedPreferences sharedPreferences;
+    User user = StartupActivity.oo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,10 +44,22 @@ public class HomeActivity extends AppCompatActivity {
         driversButton = (Button)findViewById(R.id.DriversButton);
         accountType = (TextView)findViewById(R.id.accountTypeTextViewHome);
         timeLeft = (TextView)findViewById(R.id.timeLeftTextViewHome);
+        userName = (TextView)findViewById(R.id.userNameTextViewHome);
 
         sharedPreferences = getSharedPreferences("settings", MODE_PRIVATE);
 
-        if(StartupActivity.oo.isOwner){
+
+        try {
+            userName.setText(Encryption.decrypt(user.getName()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(!user.getDrivingPermission().isEmpty()){
+            accountType.setText("Driver");
+            timeLeft.setVisibility(View.VISIBLE);
+
+            timeLeft.setText(calculateTimeLeft(user.getDrivingPermission())+"");
+        }else{
             accountType.setText("Owner");
             timeLeft.setVisibility(View.GONE);
         }
@@ -53,29 +68,38 @@ public class HomeActivity extends AppCompatActivity {
         //new GetData().execute();
 
         try {
-          //  availableBluetooth();
+            availableBluetooth();
         } catch (Exception e) {
             Toast.makeText(HomeActivity.this, "Not Connected to Car", Toast.LENGTH_SHORT).show();
         }
+
 
         ///////Buttons on click listener
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goTo(SettingsActivity.class);
+                if(user.getDrivingPermission() == "") {
+                    goTo(SettingsActivity.class);
+                }else  Toast.makeText(HomeActivity.this, "Only Owners Have Access", Toast.LENGTH_SHORT).show();
             }
         });
+        driversButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(user.getDrivingPermission() == "") {
+                    goTo(DriversActivity.class);
+                }else  Toast.makeText(HomeActivity.this, "Only Owners Have Access", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
         controlButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                     goTo(ControlCar.class);
             }
         });
-        driversButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) { goTo(DriversActivity.class);
-            }
-        });
+
 
 
     }
@@ -111,11 +135,13 @@ public class HomeActivity extends AppCompatActivity {
                         Object[] devices = (Object[]) bondedDevices.toArray();
                         for (int i = 0; i < bondedDevices.size(); i++) {
                             BluetoothDevice device = (BluetoothDevice) devices[i];
-                            if (bluetoothDeviceName.equalsIgnoreCase(device.getName())) ;
-                            bluetoothSocket = connectToDevice(device);
-                            if (bluetoothSocket.isConnected()) {
-                                Toast.makeText(HomeActivity.this, "Connected to Car", Toast.LENGTH_SHORT).show();
-                                outputStream = bluetoothSocket.getOutputStream();
+                            if (bluetoothDeviceName.equalsIgnoreCase(device.getName())) {
+                                bluetoothSocket = connectToDevice(device);
+                                if (bluetoothSocket.isConnected()) {
+                                    Toast.makeText(HomeActivity.this, "Connected to Car", Toast.LENGTH_SHORT).show();
+                                    outputStream = bluetoothSocket.getOutputStream();
+                                    break;
+                                }
                             }
                         }
                     }
@@ -139,10 +165,6 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
-    public void write(String s) throws IOException {
-        outputStream.write(s.getBytes());
-    }
-
 
     private void goTo(Class activity){
         try {
@@ -150,6 +172,13 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(intent);
         }catch (Exception e){}
 
+    }
+
+    private String calculateTimeLeft(String time){
+        Date currentDate = Calendar.getInstance().getTime();
+        Date timeLeft = new Date(time);
+       // int left = currentDate.compareTo(timeLeft);
+        return time;
     }
 
 }

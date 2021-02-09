@@ -6,17 +6,39 @@
     android:layout_height="match_parent"
     tools:context=".Register"
     android:background="@color/main">
+    <ImageButton
+        android:id="@+id/imageButtonRegister"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="16dp"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        android:src="@drawable/add_image"
+        android:background="#7A7A7A"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ListView
+        android:id="@+id/imageListViewRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxHeight="400dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageButtonRegister" />
 
     <EditText
         android:id="@+id/nameEditTextRegister"
         android:layout_width="300dp"
         android:layout_height="75dp"
-        android:layout_marginTop="84dp"
         android:hint="Full Name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/imageListViewRegister" />
 
     <EditText
         android:id="@+id/phoneNumberEditTextRegister"

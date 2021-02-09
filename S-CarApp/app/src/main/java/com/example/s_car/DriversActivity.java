@@ -1,5 +1,6 @@
 package com.example.s_car;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.icu.text.CaseMap;
 import android.os.AsyncTask;
@@ -17,6 +18,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Adapter;
+import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -27,8 +30,10 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class DriversActivity extends AppCompatActivity {
-    ListView drivers;
+    ListView driversListView;
     DriversAdapter driversAdapter;
+    Button deleteDriverButton,editDriverButton;
+    int addDriverActivity = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +41,21 @@ public class DriversActivity extends AppCompatActivity {
         setContentView(R.layout.activity_drivers);
 
         ////////////////////
-        drivers = (ListView) findViewById(R.id.driversListView);
+        driversListView = (ListView) findViewById(R.id.driversListView);
+        deleteDriverButton = (Button) findViewById(R.id.deleteDriverDriverActivity);
+        editDriverButton = (Button) findViewById(R.id.editDriverDriverActivity);
 
-        new getDrivers().execute(StartupActivity.oo.carKey);
+        new getDrivers().execute(StartupActivity.oo.id);
+
+        driversListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                editDriverButton.setVisibility(View.VISIBLE);
+                deleteDriverButton.setVisibility(View.VISIBLE);
+
+
+            }
+        });
 
     }
 
@@ -56,18 +73,28 @@ public class DriversActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case R.id.addNewDriverButton:
                 Intent intent = new Intent(getApplicationContext(),AddDriversActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent,addDriverActivity);
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-    class getDrivers extends AsyncTask<String , Void ,ArrayList<User>> {
+        if (requestCode == addDriverActivity) {
+            if(resultCode == Activity.RESULT_OK){
+                new getDrivers().execute(StartupActivity.oo.id);
+            }
+        }
+    }//onActivityResult
+
+    class getDrivers extends AsyncTask<Integer, Void ,ArrayList<Driver>> {
 
         @Override
-        protected ArrayList<User> doInBackground(String... strings) {
+        protected ArrayList<Driver> doInBackground(Integer... ints) {
 
-            String carKey = strings[0];
+            int ownerId = ints[0];
             try {
                 ObjectOutputStream os = null;
                 ObjectInputStream ois = null;
@@ -81,16 +108,16 @@ public class DriversActivity extends AppCompatActivity {
                 // Specify the content type that we will send binary data
                 con.setRequestProperty("Content-Type", "application/octet-stream");
                 os = new ObjectOutputStream(con.getOutputStream());
-                os.writeObject(carKey);
+                os.writeObject(ownerId);
                 os.flush();
                 os.close();
 
                 ois = new ObjectInputStream(con.getInputStream());
-                ArrayList<User> drivers = new ArrayList<>();
+                ArrayList<Driver> drivers = new ArrayList<>();
                 while(true){
-                    User user = (User) ois.readObject();
-                    if(user.getId() == 0) break;
-                    drivers.add(user);
+                    Driver driver = (Driver) ois.readObject();
+                    if(driver.getId() == 0) break;
+                    drivers.add(driver);
                 }
                 return  drivers;
             } catch (Exception e) {
@@ -100,10 +127,10 @@ public class DriversActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(ArrayList<User> user) {
-            if(user != null){
-                driversAdapter = new DriversAdapter(getApplicationContext(),user);
-                drivers.setAdapter(driversAdapter);
+        protected void onPostExecute(ArrayList<Driver> drivers) {
+            if(drivers != null){
+                driversAdapter = new DriversAdapter(getApplicationContext(),drivers);
+                driversListView.setAdapter(driversAdapter);
                 driversAdapter.notifyDataSetChanged();
             }else{
                 Toast.makeText(DriversActivity.this, "Empty", Toast.LENGTH_SHORT).show();

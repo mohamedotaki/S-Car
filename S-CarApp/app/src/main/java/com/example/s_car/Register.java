@@ -5,8 +5,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.ObjectInputStream;
@@ -14,12 +17,17 @@ import java.io.ObjectOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Date;
+import java.util.UUID;
 
 public class Register extends AppCompatActivity {
 
     Button registerButton;
     EditText name, password , phoneNumber, emailAddress, carNumber, conformPassword;
     static String result= "";
+    ImageButton addImageButton;
+    ListView imageListView ;
+    ImagesAdapter imagesAdapter;
+    int choseImage;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +40,30 @@ public class Register extends AppCompatActivity {
         carNumber = (EditText) findViewById(R.id.carNumberEditTextRegister);
         emailAddress = (EditText) findViewById(R.id.EmailAddressEditTextRegister);
         phoneNumber = (EditText) findViewById(R.id.phoneNumberEditTextRegister);
+        addImageButton = findViewById(R.id.imageButtonRegister);
+        imageListView = findViewById(R.id.imageListViewRegister);
+
+        addImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imageListView.setVisibility(View.VISIBLE);
+                imagesAdapter = new ImagesAdapter(getApplicationContext());
+                imageListView.setAdapter(imagesAdapter);
+                imagesAdapter.notifyDataSetChanged();
+
+            }
+        });
+
+        imageListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                choseImage =  imagesAdapter.getItem(position);
+                addImageButton.setImageResource(choseImage);
+                imageListView.setVisibility(View.GONE);
+            }
+        });
+
+
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -39,8 +71,9 @@ public class Register extends AppCompatActivity {
                 && !carNumber.getText().toString().isEmpty() && !emailAddress.getText().toString().isEmpty() &&!phoneNumber.getText().toString().isEmpty()){
                     if(password.getText().toString().equals(conformPassword.getText().toString())){
                         try {
+                            String keyNo = UUID.randomUUID().toString();
                             User user = new User(getEncryptedText(name), getEncryptedText(emailAddress), getEncryptedText(phoneNumber),
-                                    getEncryptedText(carNumber), getEncryptedText(password));
+                                    getEncryptedText(carNumber), getEncryptedText(password),Encryption.encrypt(keyNo),choseImage);
                              new registerUser().execute(user);
                         }catch (Exception e){ }
                     }else{
@@ -58,8 +91,6 @@ public class Register extends AppCompatActivity {
         @Override
         protected String doInBackground(User... users) {
             User user = users[0];
-            user.setOwner(true);
-            user.setDrivingPermission(null);
             try {
                 ObjectInputStream ois = null;
                 URL url = new URL("http://192.168.1.5:8080/S_Car_Server_war_exploded/" + "Register");

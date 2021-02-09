@@ -39,7 +39,6 @@ public class StartupActivity extends AppCompatActivity {
     Button register, login;
     EditText password,email;
     CheckBox rememberLogin;
-    ConnectionToServer connection ;
     public static User oo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,35 +106,6 @@ public class StartupActivity extends AppCompatActivity {
             Toast.makeText(StartupActivity.this,"Please Login",Toast.LENGTH_SHORT).show();
 
         }
-    }
-
-    public void checkLogin (){
-        Runnable runnable = new Runnable(){
-            public void run() {
-                try {
-                    InputStream is = null;
-                    String result=null;
-                    String line = null;
-                    URL url = new URL("http://192.168.1.5/S_Car_Server_war_exploded/" + "Login");
-                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                    con.setDoInput(true);
-                    con.setRequestMethod("GET");
-                    is = new BufferedInputStream(con.getInputStream());
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
-                    StringBuilder stringBuilder = new StringBuilder();
-                    while ((line = bufferedReader.readLine()) != null) {
-                        stringBuilder.append(line + "\n");
-                    }
-                    is.close();
-
-
-                    result = stringBuilder.toString();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
     }
 
     private void VerifyPermissions() {

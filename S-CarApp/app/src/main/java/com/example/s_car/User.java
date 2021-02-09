@@ -13,34 +13,23 @@ public class User implements Serializable {
     String carNumber = "";
     String password = "";
     String carKey ="";
-    boolean isOwner = false;
-    String drivingPermission = null;
+    int imageId;
 
 
     public User() {
     }
 
-    public User(String name, String emailAddress, String phoneNumber, String carNumber, String password) {
-        this.name = name;
-        this.emailAddress = emailAddress;
-        this.phoneNumber = phoneNumber;
-        this.carNumber = carNumber;
-        this.password = password;
-    }
-
-    public User(int id, String name, String emailAddress, String phoneNumber, String carNumber, String password, String carKey, boolean isOwner, String drivingPermission) {
-        this.id = id;
+    public User(String name, String emailAddress, String phoneNumber, String carNumber, String password, String carKey, int imageId) {
         this.name = name;
         this.emailAddress = emailAddress;
         this.phoneNumber = phoneNumber;
         this.carNumber = carNumber;
         this.password = password;
         this.carKey = carKey;
-        this.isOwner = isOwner;
-        this.drivingPermission = drivingPermission;
+        this.imageId = imageId;
     }
 
-    public User(int id, int loginID, String name, String emailAddress, String phoneNumber, String carNumber, String password, String carKey, boolean isOwner, String drivingPermission) {
+    public User(int id, int loginID, String name, String emailAddress, String phoneNumber, String carNumber, String password, String carKey, int imageId) {
         this.id = id;
         this.loginID = loginID;
         this.name = name;
@@ -49,24 +38,7 @@ public class User implements Serializable {
         this.carNumber = carNumber;
         this.password = password;
         this.carKey = carKey;
-        this.isOwner = isOwner;
-        this.drivingPermission = drivingPermission;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", loginID=" + loginID +
-                ", name='" + name + '\'' +
-                ", emailAddress='" + emailAddress + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", carNumber='" + carNumber + '\'' +
-                ", password='" + password + '\'' +
-                ", carKey='" + carKey + '\'' +
-                ", isOwner=" + isOwner +
-                ", drivingPermission='" + drivingPermission + '\'' +
-                '}';
+        this.imageId = imageId;
     }
 
     public int getId() {
@@ -133,19 +105,16 @@ public class User implements Serializable {
         this.carKey = carKey;
     }
 
-    public boolean isOwner() {
-        return isOwner;
+    public int getImageId() {
+        return imageId;
     }
 
-    public void setOwner(boolean owner) {
-        isOwner = owner;
+    public void setImageId(int imageId) {
+        this.imageId = imageId;
     }
 
-    public String getDrivingPermission() {
-        return drivingPermission;
+    public String getDrivingPermission(){
+        return "";
     }
 
-    public void setDrivingPermission(String drivingPermission) {
-        this.drivingPermission = drivingPermission;
-    }
 }

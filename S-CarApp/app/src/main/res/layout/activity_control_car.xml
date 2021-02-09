@@ -8,7 +8,7 @@
     android:background="@color/main">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/frontSensorTextViewControlCar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Front Sensor"
@@ -18,7 +18,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/backSensorTextView"
+        android:id="@+id/backSensorTextViewControlCar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Back Sensor"
@@ -29,7 +29,7 @@
         app:layout_constraintTop_toBottomOf="@+id/bottomArrow" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/rightSensorTextViewControlCar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Right "
@@ -39,7 +39,7 @@
         app:layout_constraintTop_toBottomOf="@+id/topArrow" />
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/leftSensorTextViewControlCar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Left"
@@ -118,7 +118,7 @@
         android:padding="0dp"
         android:scaleType="centerCrop"
         android:src="@drawable/parking_button"
-        app:layout_constraintBottom_toTopOf="@+id/textView4"
+        app:layout_constraintBottom_toTopOf="@+id/leftSensorTextViewControlCar"
         app:layout_constraintEnd_toStartOf="@+id/topArrow"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

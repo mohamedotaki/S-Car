@@ -17,11 +17,11 @@ import java.util.ArrayList;
 public class DriversAdapter extends BaseAdapter {
 
 
-    ArrayList<User> customers = new ArrayList<User>();
+    ArrayList<Driver> customers = new ArrayList<Driver>();
     Context context;
     String CN, CID;
 
-    public DriversAdapter(Context context, ArrayList<User> customers) {
+    public DriversAdapter(Context context, ArrayList<Driver> customers) {
         this.customers = customers;
         this.context = context;
     }
@@ -32,7 +32,7 @@ public class DriversAdapter extends BaseAdapter {
     }
 
     @Override
-    public User getItem(int index) {
+    public Driver getItem(int index) {
         return customers.get(index);
     }
 
@@ -48,13 +48,12 @@ public class DriversAdapter extends BaseAdapter {
         TextView name = (TextView) view.findViewById(R.id.driverNameTextViewAdapter);
         TextView validTill = (TextView) view.findViewById(R.id.validTillTextViewAdapter);
 
-        final User customer = getItem(index);
+        final Driver customer = getItem(index);
 
         try {
 
             name.setText(Encryption.decrypt(customer.getName()));
-            int id = context.getResources().getIdentifier("car.png","Drawable" , context.getPackageName());
-            driverImage.setImageResource(id);
+            driverImage.setImageResource(customer.getImageId());
         } catch (Exception e) {
             e.printStackTrace();
         }

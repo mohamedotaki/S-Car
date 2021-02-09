@@ -1,5 +1,7 @@
 package com.example.s_car;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.bluetooth.BluetoothAdapter;
@@ -7,12 +9,16 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothHeadset;
 import android.bluetooth.BluetoothProfile;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.ParcelUuid;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -24,6 +30,10 @@ public class ControlCar extends AppCompatActivity {
 
     Button stop;
     ImageButton forwardButton,leftButton,rightButton,reverseButton,parkingAssistButton;
+    BluetoothSocket bluetoothSocket = HomeActivity.bluetoothSocket;
+    OutputStream outputStream;
+    Thread bluetoothThread;
+    TextView frontSensor,backSensor,leftSensor,rightSensor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,14 +44,27 @@ public class ControlCar extends AppCompatActivity {
         rightButton = (ImageButton) findViewById(R.id.rightArrow);
         reverseButton = (ImageButton) findViewById(R.id.bottomArrow);
         stop = (Button) findViewById(R.id.StopButton);
+        frontSensor = (TextView) findViewById(R.id.frontSensorTextViewControlCar);
+        backSensor = (TextView) findViewById(R.id.backSensorTextViewControlCar);
+        leftSensor = (TextView) findViewById(R.id.leftSensorTextViewControlCar);
+        rightSensor = (TextView) findViewById(R.id.rightSensorTextViewControlCar);
+        if(!bluetoothSocket.isConnected()){
+            Toast.makeText(ControlCar.this,"Please Connect to Car Using Bluetooth",Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
+        getSensorsValue(bluetoothSocket);
+        bluetoothThread.start();
+
         try {
-           // blue();
+            outputStream = bluetoothSocket.getOutputStream();
+            write("C");
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(ControlCar.this,"Couldn't connect",Toast.LENGTH_SHORT).show();
             finish();
         }
- /*           parkingAssistButton.setOnClickListener(new View.OnClickListener() {
+        parkingAssistButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     try {
@@ -100,21 +123,55 @@ public class ControlCar extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-            });*/
-
-
-
-
-
-
-
-
-
+            });
 
     }
+    public void write(String s)  throws IOException {
+        outputStream.write(s.getBytes());
+    }
 
+    @Override
+    public void onBackPressed() {
+        try {
+            write("E");
+            bluetoothThread.stop();
+        } catch (IOException e) {}
 
+        super.onBackPressed();
+    }
+    private void getSensorsValue(BluetoothSocket bluetoothSocket){
+        final InputStream inputStream ;
+        InputStream tmpIn = null;
+        try {
+            tmpIn = bluetoothSocket.getInputStream();
+        } catch (IOException e) {}
+        inputStream = tmpIn;
+         bluetoothThread = new Thread() {
+             @Override
+             public void run() {
+                 while (true) {
+                     byte[] buffer = new byte[8];
+                     int bytes;
+                     try {
+                         Thread.sleep(500);
+                         bytes = inputStream.read(buffer);            //read bytes from input buffer
+                         final byte[] data = buffer;
+                         runOnUiThread(new Runnable() {
+                             @Override
+                             public void run() {
+                                 rightSensor.setText((short)(((data[0]) & 0xFF) << 8 | (data[1]) & 0xFF));
+                                 frontSensor.setText((short)(((data[2]) & 0xFF) << 8 | (data[3]) & 0xFF));
+                                 backSensor.setText((short)(((data[4]) & 0xFF) << 8 | (data[5]) & 0xFF));
+                                 leftSensor.setText((short)(((data[6]) & 0xFF) << 8 | (data[7]) & 0xFF));
+                             }
+                         });
+                     } catch (Exception e) {
+                         break;
+                     }
+                 }
+             }
 
-
-
+         };
+    }
 }
+

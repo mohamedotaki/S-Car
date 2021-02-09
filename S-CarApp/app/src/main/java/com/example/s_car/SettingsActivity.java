@@ -68,7 +68,7 @@ public class SettingsActivity extends AppCompatActivity {
                         bluetoothSocket = HomeActivity.connectToDevice(bluetoothDevicesArrayList.get(position));
                         if (bluetoothSocket.isConnected()) {
                            SharedPreferences sharedPref = getSharedPreferences("settings", MODE_PRIVATE);
-                           sharedPref.edit().putString("bluetoothDeviceName", bluetoothDevicesArrayList.get(position).getName()).commit();
+                           sharedPref.edit().putString("bluetoothDeviceName", bluetoothDevicesArrayList.get(position).getName()).apply();
                             Toast.makeText(SettingsActivity.this,"Connected to "+ bluetoothDevicesArrayList.get(position).getName(),Toast.LENGTH_SHORT).show();
                            outputStream = bluetoothSocket.getOutputStream();
                             // isConnectedBluetooth.setText("Connected");
