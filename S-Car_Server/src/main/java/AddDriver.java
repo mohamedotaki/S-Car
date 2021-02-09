@@ -1,3 +1,4 @@
+import com.example.s_car.Driver;
 import com.example.s_car.User;
 
 import java.io.IOException;
@@ -36,28 +37,29 @@ public class AddDriver extends HttpServlet {
         ObjectOutputStream oos = new ObjectOutputStream(outstr);
 
         try {
-            User user = (User) ois.readObject();
+          Driver driver = (Driver) ois.readObject();
 
-            if(user != null) {
+            if(driver != null) {
                 Class.forName( "com.mysql.cj.jdbc.Driver" );
                 Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar","root","root" );
-                PreparedStatement addToLogin = con.prepareStatement("Insert Into login  Values (null,?,?)", Statement.RETURN_GENERATED_KEYS);
-                addToLogin.setNString(1,user.getEmailAddress());
-                addToLogin.setNString(2,"123456789");
+                PreparedStatement addToLogin = con.prepareStatement("Insert Into login  Values (null,?,?,false)", Statement.RETURN_GENERATED_KEYS);
+                addToLogin.setString(1,driver.getEmailAddress());
+                addToLogin.setString(2,driver.getPassword());
                 int rs = addToLogin.executeUpdate();
                 ResultSet resultSet = addToLogin.getGeneratedKeys();
                 int loginID = 0;
                 if(resultSet.next() && rs >0){
                     rs =0;
                     loginID = resultSet.getInt(1);
-                    PreparedStatement addToDriver = con.prepareStatement("Insert Into drivers  Values (null,?,?,?,?,?,?,?)");
+                    PreparedStatement addToDriver = con.prepareStatement("Insert Into drivers  Values (null,?,?,?,?,?,?,?,?)");
                     addToDriver.setInt(1,loginID);
-                    addToDriver.setNString(2,user.getName());
-                    addToDriver.setNString(3,user.getPhoneNumber());
-                    addToDriver.setNString(4,user.getCarNumber());
-                    addToDriver.setNString(5,user.getCarKey());
-                    addToDriver.setBoolean(6,user.isOwner());
-                    addToDriver.setNString(7,user.getDrivingPermission());
+                    addToDriver.setInt(2,driver.getOwnerId());
+                    addToDriver.setString(3,driver.getName());
+                    addToDriver.setString(4,driver.getPhoneNumber());
+                    addToDriver.setString(5,driver.getCarNumber());
+                    addToDriver.setString(6,driver.getCarKey());
+                    addToDriver.setString(7,driver.getDrivingPermission());
+                    addToDriver.setInt(8,driver.getImageId());
                     rs = addToDriver.executeUpdate();
                     addToDriver.close();
                     if(rs >0){

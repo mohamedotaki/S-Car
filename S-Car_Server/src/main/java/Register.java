@@ -28,38 +28,33 @@ public class Register extends HttpServlet {
             if(user != null) {
                 Class.forName( "com.mysql.cj.jdbc.Driver" );
                 Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar","root","root" );
-                PreparedStatement checkOwner = con.prepareStatement("SELECT count(*) FROM drivers , login where carNumber like ? or email like ?");
+                PreparedStatement checkOwner = con.prepareStatement("SELECT count(*) FROM owners , login where carNumber like ? or email like ?");
                 checkOwner.setNString(1, user.getCarNumber());
                 checkOwner.setNString(2, user.getEmailAddress());
                 resultSet = checkOwner.executeQuery();
-
                 resultSet.next();
+
                 if(resultSet.getInt(1) <= 0) {
                     checkOwner.close();
-                    PreparedStatement addOwnerLogin = con.prepareStatement("INSERT INTO login VALUE (null ,?,?)");
+                    PreparedStatement addOwnerLogin = con.prepareStatement("INSERT INTO login VALUE (null ,?,?,true)", Statement.RETURN_GENERATED_KEYS);
                     addOwnerLogin.setNString(1, user.getEmailAddress());
                     addOwnerLogin.setNString(2, user.getPassword());
                     result = addOwnerLogin.executeUpdate();
-                    addOwnerLogin.close();
-
-                    if (result > 0) {
+                    resultSet = null;
+                    resultSet = addOwnerLogin.getGeneratedKeys();
+                    if (resultSet.next() && result > 0) {
                         result = 0;
-                        PreparedStatement getOwnerId = con.prepareStatement("SELECT loginId FROM login WHERE email like ?");
-                        getOwnerId.setNString(1, user.getEmailAddress());
-                        resultSet = getOwnerId.executeQuery();
-                        resultSet.next();
-                        int loginID = resultSet.getInt("loginId");
-                        System.out.println(loginID);
-                        getOwnerId.close();
+                        int loginID = resultSet.getInt(1);
+                        addOwnerLogin.close();
                         if(loginID !=0){
-                            PreparedStatement addOwner = con.prepareStatement("INSERT INTO drivers VALUE (null,?,?,?,?,?,?,?)");
+                            PreparedStatement addOwner = con.prepareStatement("INSERT INTO owners VALUE (null,?,?,?,?,?,?)");
                             addOwner.setInt(1, loginID);
                             addOwner.setNString(2, user.getName());
                             addOwner.setNString(3, user.getPhoneNumber());
                             addOwner.setNString(4, user.getCarNumber());
                             addOwner.setNString(5, user.getCarKey());
-                            addOwner.setBoolean(6, user.isOwner());
-                            addOwner.setNString(7, user.getDrivingPermission());
+                            addOwner.setInt(6, user.getImageId());
+
                             result = addOwner.executeUpdate();
 
                             addOwner.close();

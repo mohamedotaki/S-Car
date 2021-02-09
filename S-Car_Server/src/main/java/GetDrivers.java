@@ -1,4 +1,5 @@
 
+import com.example.s_car.Driver;
 import com.example.s_car.User;
 
 import java.io.IOException;
@@ -41,25 +42,22 @@ public class GetDrivers extends HttpServlet {
 
         try {
             // response.setContentType("application/x-java-serialized-object");
-            String carKey = (String)inputFromApp.readObject();
-            System.out.println(carKey);
-            if(carKey == null) {
-                carKey = "";  // default to all
+            int ownerId = (Integer) inputFromApp.readObject();
+            if(ownerId == 0) {
+                ownerId = 0;  // default to all
             }
             Class.forName( "com.mysql.cj.jdbc.Driver" );
             Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar","root","root" );
 
-            PreparedStatement find = con.prepareStatement("select * from drivers , login where keyNo LIKE ? AND isOwner LIKE ? AND login.loginId LIKE drivers.loginId   ;");
-            find.setString(1, carKey);
-            find.setInt(2, 0);
+            PreparedStatement find = con.prepareStatement("select * from drivers , login where ownerId LIKE ? AND login.loginId LIKE drivers.loginId   ;");
+            find.setInt(1, ownerId);
             ResultSet rs = find.executeQuery();
             while(rs.next()) {
                 System.out.println(rs.getString(3));
-                User user = new User(rs.getInt("driverId"), rs.getInt("loginId"),rs.getString("fullName"),rs.getString("email"),
-                        rs.getString("phoneNumber"),rs.getString("carNumber"),rs.getString("password"),rs.getString("keyNo"),
-                        rs.getBoolean("isOwner"),rs.getString("drivingPermission"));
-                oos.writeObject(user);
-                System.out.println(user);
+                Driver driver = new Driver(rs.getInt("driverId"), rs.getInt("loginId"),rs.getInt("ownerId"),rs.getString("fullName"),rs.getString("email"),
+                        rs.getString("phoneNumber"),rs.getString("carNumber"),rs.getString("password"),rs.getString("keyNo"),rs.getInt("imageId"),
+                        rs.getString("drivingPermission"));
+                oos.writeObject(driver);
 
             }
 
@@ -72,7 +70,7 @@ public class GetDrivers extends HttpServlet {
             System.out.println(ex.toString());
         }
         finally{
-            User last = new User();
+            Driver last = new Driver();
             oos.writeObject(last);  // customer with a blank id indicates the last one
 
             oos.flush();

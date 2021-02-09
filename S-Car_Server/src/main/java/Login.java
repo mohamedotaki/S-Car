@@ -1,3 +1,4 @@
+import com.example.s_car.Driver;
 import com.example.s_car.User;
 
 import javax.servlet.ServletException;
@@ -31,31 +32,46 @@ public class Login extends HttpServlet {
          try {
             String email = ois.readObject().toString();
              String pass = ois.readObject().toString();
-           System.out.println(email+"--"+pass);
+             System.out.println(email +"\n"+pass);
             if(!email.isEmpty() && !pass.isEmpty()) {
                 Class.forName( "com.mysql.cj.jdbc.Driver" );
                 Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar","root","root" );
-                PreparedStatement checkLogin = con.prepareStatement("SELECT loginId FROM login where email like ? and password like ?");
-                checkLogin.setNString(1, email);
-                checkLogin.setNString(2, pass);
+                PreparedStatement checkLogin = con.prepareStatement("SELECT loginId, isOwner FROM login where email like ? and password like ?");
+                checkLogin.setString(1, email);
+                checkLogin.setString(2, pass);
                ResultSet resultSet = checkLogin.executeQuery();
                resultSet.next();
                result= resultSet.getInt(1);
+               boolean isOwner = resultSet.getBoolean(2);
                System.out.println(result);
                 if(result>0){
-                    resultSet =null;
-                    PreparedStatement getUser = con.prepareStatement("SELECT driverId , fullName, phoneNumber, carNumber, keyNo, isOwner, drivingPermission FROM drivers where loginId like ?");
-                    getUser.setInt(1, result);
-                    System.out.println("result");
-                    resultSet = getUser.executeQuery();
-                    System.out.println("ddd");
-                    resultSet.next();
-                    User user = new User(resultSet.getInt(1),resultSet.getString(2),email,resultSet.getString(3),
-                            resultSet.getString(4),pass,resultSet.getString(5),resultSet.getBoolean(6),
-                            resultSet.getString(7));
-                    System.out.println("sss");
-                    oos.writeObject(user);
-                    System.out.println("sent");
+                    if(isOwner){
+                        resultSet =null;
+                        PreparedStatement getUser = con.prepareStatement("SELECT ownerId , fullName, phoneNumber, carNumber, keyNo, imageId FROM owners where loginId like ?");
+                        getUser.setInt(1, result);
+                        resultSet = getUser.executeQuery();
+                        resultSet.next();
+                        User user = new User(resultSet.getInt(1),result,resultSet.getString(2),email,resultSet.getString(3),
+                                resultSet.getString(4),pass,resultSet.getString(5),resultSet.getInt(6));
+                        oos.writeObject(user);
+                        System.out.println("sent");
+                    }else {
+                        resultSet =null;
+                        PreparedStatement getUser = con.prepareStatement("SELECT * FROM drivers where loginId like ?");
+                        getUser.setInt(1, result);
+                        resultSet = getUser.executeQuery();
+                        resultSet.next();
+                        Driver driver = new Driver(resultSet.getInt("driverId"),result,resultSet.getInt("ownerId")
+                                ,resultSet.getString("fullName"),email,resultSet.getString("phoneNumber"),
+                                resultSet.getString("carNumber"),pass,resultSet.getString("keyNo"),resultSet.getInt("imageId")
+                                ,resultSet.getString("drivingPermission"));
+                        User user = driver;
+                        oos.writeObject(user);
+                        System.out.println("sent driver");
+                    }
+
+
+
                 }else oos.writeBoolean(false);
                 checkLogin.close();
                 con.close();
