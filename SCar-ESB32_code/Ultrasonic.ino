@@ -21,7 +21,7 @@
   
 
 
-  delay(100);
+ // delay(100);
 
   return cm;
   

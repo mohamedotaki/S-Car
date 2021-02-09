@@ -1,12 +1,19 @@
+#define frontSensorBit (1 << 0)
+#define rightSensorBit (1<<1)
+#define leftSensorBit (1<<2)
+#define backSensorBit (1<<3)
+#define allSensorBits (frontSensorBit | rightSensorBit | leftSensorBit | backSensorBit)
 #include <WiFi.h>
 #include "BluetoothSerial.h"
+#include <FreeRTOS.h>
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
 #error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
 #endif
 
-BluetoothSerial SerialBT;
 
-TaskHandle_t task1Handle = NULL,wifiTaskHandle = NULL;
+BluetoothSerial SerialBT;
+static EventGroupHandle_t  xEventGroup;
+TaskHandle_t task1Handle = NULL,ultrasonicTaskHandle = NULL;
 
 //no changes 
 // Servo
@@ -23,13 +30,13 @@ const int frontSensor = 2;
 const int backSensor = 0;
 const int rightSensorB = 16;
 const int rightSensorF = 4;
-int f,r,l,b;
+  int BTSteering =1500;
+int f,b,rfs,r;
 //Car Settings
 int reversingSpeed = 1353, forwardSpeed = 1592;
 int beforParkingPos=0;
 int carWidth = 35; // car width is 26cm and 10cm for safty
 int  carLength = 50; // car length is 41cm and 9cm for safty
-
 
 
 void mainTask( void *pvParameters );
@@ -58,8 +65,9 @@ void setup() {
     ledcWrite(escChan,1489);
     delay(1000);
   // Tasks 
-    xTaskCreatePinnedToCore(mainTask,"mainTask",1024,NULL,3,&task1Handle,0);
-//    xTaskCreatePinnedToCore(wifiTask,"wifiTask",2000,NULL,3,&wifiTaskHandle,1);
+  xEventGroup  =  xEventGroupCreate();
+    xTaskCreatePinnedToCore(mainTask,"mainTask",2000,NULL,3,&task1Handle,0);
+    xTaskCreatePinnedToCore(ultrasonicTask,"ultrasonicTask",2000,NULL,3,&ultrasonicTaskHandle,1);
 //    vTaskSuspend(wifiTaskHandle);
 /////////////////////////////////////////////////////////
     pinMode(26, INPUT);
@@ -67,20 +75,20 @@ void setup() {
 }
 
 void loop(){
-
-f=ultrasonicValue(frontSensor);
-b=ultrasonicValue(backSensor);
-l=ultrasonicValue(rightSensorF);
-r=ultrasonicValue(rightSensorB);
-Serial.print ("\n");
-Serial.print (f);
-Serial.print ("  -  ");
-Serial.print (r);
-Serial.print ("  -  ");
-Serial.print (l);
-Serial.print ("  -  ");
-Serial.print (b);
-Serial.print ("\n");
+//
+//f=ultrasonicValue(frontSensor);
+//b=ultrasonicValue(backSensor);
+//rfs=ultrasonicValue(rightSensorF);
+//r=ultrasonicValue(rightSensorB);
+//Serial.print ("\n");
+//Serial.print (f);
+//Serial.print ("  -  ");
+//Serial.print (r);
+//Serial.print ("  -  ");
+//Serial.print (rfs);
+//Serial.print ("  -  ");
+//Serial.print (b);
+//Serial.print ("\n");
 //
 //delay(2000);
 //maxLeftServo();
@@ -113,63 +121,45 @@ Serial.print ("\n");
 
   
 }
-//void wifiTask(void *pvParameters)
-//{
-//  (void) pvParameters;
-//  for (;;)
-//  {
-//  //  scanNetworks();
-//    vTaskSuspend(NULL);
-//
-//  }
-//  }
+void ultrasonicTask(void *pvParameters)
+{
+ 
+  EventBits_t xEventGroupValue;
+  for (;;)
+  {
+      xEventGroupValue  = xEventGroupWaitBits(xEventGroup, allSensorBits , pdTRUE,pdFALSE, portMAX_DELAY );
+   if((xEventGroupValue & frontSensorBit) !=0){
+     f=ultrasonicValue(frontSensor);
+     Serial.print(f);
+    }
+    if((xEventGroupValue & backSensorBit) !=0){
+   b= ultrasonicValue(backSensor);
+    }
+   if((xEventGroupValue & leftSensorBit) !=0){
+   rfs= ultrasonicValue(rightSensorF);
+   }
+   if((xEventGroupValue & rightSensorBit) !=0){
+    r=ultrasonicValue(rightSensorB);
+    Serial.print(r);
+   }
+
+     vTaskDelay(10);
+
+  }
+  }
 
 void mainTask(void *pvParameters)
 {
-  int BTSteering =1500;
-  (void) pvParameters;
   for (;;)
   {
-   parkingAssist();
-    vTaskSuspend(NULL);
-  if (SerialBT.available()) {
-    switch(SerialBT.read()){
-      case 'L':         // turn left 
-      BTSteering = BTSteering+100;
-      if(BTSteering >=1900){
-        BTSteering=1900;
-      }
-      rightServo(BTSteering);
-      break;
-      case 'R':         // Turn Right
-      BTSteering = BTSteering-100;
-      if(BTSteering <=1100){
-        BTSteering= 1100;
-      }
-      rightServo(BTSteering);
-      break;
-      case 'F':         // go forward or increase the speed
-      Serial.println("forward");
-      break;
-      case 'B':         //  reverse or increase the speed
-      Serial.println("reverse");
-      break;
-      case 'S':         // Stop motor
-      Serial.println("stop");
-      vTaskResume(wifiTaskHandle);
-      break;
-      case 'P':         // go forward or increase the speed
-      Serial.println("parking assist");
-       parkingAssist();
-      break;
-    }
-     }
-     delay(20);
-
-
+ //bluetooth();
+ int aa=0;
+ if(aa ==0){
+   xEventGroupSetBits(xEventGroup, frontSensorBit | rightSensorBit);
+aa++;
+ }
 
     
-    int steering =1500, currentPos=0, emptySpace=0;
     
    // motorF(1650);
    //motorF(1580);
@@ -182,40 +172,7 @@ void mainTask(void *pvParameters)
   
       //searchForEmptySpace(r);
      // park();
-    
-
-   
-
-
-
-
-
-
-
-
-
-
-    
-
-//f=ultrasonicValue(frontSensor);
-//b=ultrasonicValue(backSensor);
-//l=ultrasonicValue(leftSensor);
-//r=ultrasonicValue(rightSensor);
-//if(f<=5){
-//  Serial.print ("Stoooooooooooooooooop");
-// // motorEmergncyStop();
-//}
-//Serial.print ("\n");
-//Serial.print (f);
-//Serial.print ("  -  ");
-//Serial.print (r);
-//Serial.print ("  -  ");
-//Serial.print (l);
-//Serial.print ("  -  ");
-//Serial.print (b);
-//Serial.print ("\n");
-//
-//    vTaskDelay(10);  // one tick delay (15ms) in between reads for stability
+    vTaskDelay(10);  // one tick delay (15ms) in between reads for stability
      
 
   }
