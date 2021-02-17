@@ -1,11 +1,9 @@
 void bluetooth(){
  if (SerialBT.available()) {
   switch(SerialBT.read()){
-    case 'C':
+    case 'C':{
     boolean inControlCar = true;
     while(inControlCar){
-      Serial.println("in while loop");
-      
       uint8_t a[8] ={ highByte(ultrasonicValue(frontSensor)),lowByte(ultrasonicValue(frontSensor)),
                       highByte(ultrasonicValue(backSensor)),lowByte(ultrasonicValue(backSensor)),
                       highByte(ultrasonicValue(rightSensorF)),lowByte(ultrasonicValue(rightSensorF)),
@@ -13,8 +11,6 @@ void bluetooth(){
 
       SerialBT.write(a,8);
 
-
-      
      if (SerialBT.available()) {
        switch(SerialBT.read()){
         case 'L':         // turn left 
@@ -53,14 +49,16 @@ void bluetooth(){
       break;
       case 'E':         // go forward or increase the speed
       inControlCar = false;
-      Serial.println("Exit");
       break;
     }
      }
-     delay(20);
-      
     }
-    Serial.println("Out");
+    }break;
+    
+    case 'W':{
+    scanNetworks();
+    }break;
+    
   }
  }
 

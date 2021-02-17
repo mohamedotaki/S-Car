@@ -66,9 +66,9 @@ void setup() {
     delay(1000);
   // Tasks 
   xEventGroup  =  xEventGroupCreate();
-    xTaskCreatePinnedToCore(mainTask,"mainTask",2000,NULL,3,&task1Handle,0);
-    xTaskCreatePinnedToCore(ultrasonicTask,"ultrasonicTask",2000,NULL,3,&ultrasonicTaskHandle,1);
-//    vTaskSuspend(wifiTaskHandle);
+    xTaskCreatePinnedToCore(mainTask,"mainTask",3000,NULL,3,&task1Handle,0);
+    xTaskCreatePinnedToCore(ultrasonicTask,"ultrasonicTask",500,NULL,3,&ultrasonicTaskHandle,1);
+    vTaskSuspend(ultrasonicTaskHandle);
 /////////////////////////////////////////////////////////
     pinMode(26, INPUT);
      pinMode(25, INPUT);
@@ -152,12 +152,12 @@ void mainTask(void *pvParameters)
 {
   for (;;)
   {
- //bluetooth();
- int aa=0;
- if(aa ==0){
-   xEventGroupSetBits(xEventGroup, frontSensorBit | rightSensorBit);
-aa++;
- }
+ bluetooth();
+// int aa=0;
+// if(aa ==0){
+//   xEventGroupSetBits(xEventGroup, frontSensorBit | rightSensorBit);
+//aa++;
+// }
 
     
     
