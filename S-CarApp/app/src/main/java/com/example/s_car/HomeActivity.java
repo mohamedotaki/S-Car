@@ -35,6 +35,7 @@ public class HomeActivity extends AppCompatActivity {
     public static BluetoothSocket bluetoothSocket;
     SharedPreferences sharedPreferences;
     User user = StartupActivity.oo;
+    boolean connectedToBluetooth = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,7 +97,13 @@ public class HomeActivity extends AppCompatActivity {
         controlButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    goTo(ControlCar.class);
+                try {
+                    if (bluetoothSocket.isConnected())
+                        goTo(ControlCar.class);
+                    else throw new Exception();
+                }catch (Exception e){
+                    Toast.makeText(HomeActivity.this, "Please Connect to Car Using Bluetooth", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -140,6 +147,7 @@ public class HomeActivity extends AppCompatActivity {
                                 if (bluetoothSocket.isConnected()) {
                                     Toast.makeText(HomeActivity.this, "Connected to Car", Toast.LENGTH_SHORT).show();
                                     outputStream = bluetoothSocket.getOutputStream();
+                                    connectedToBluetooth = true;
                                     break;
                                 }
                             }

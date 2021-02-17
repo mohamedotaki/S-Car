@@ -2,16 +2,12 @@ package com.example.s_car;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.ParcelUuid;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -25,21 +21,21 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Set;
 
 public class SettingsActivity extends AppCompatActivity {
     Switch wifiSwitch;
     TextView wifiListHeading,isConnectedBluetooth ;
-    Button wifiConnectButton,enableBluetoothButton;
+    Button wifiConnectButton, bluetoothButton;
     ListView availableWifiList,bluetoothListView;
     EditText wifiPasswordEditText;
     String[] bluetoothDevicesArray , availableWifi;
     ArrayAdapter bluetoothAdapter,wifiAdapter;
     ArrayList<BluetoothDevice> bluetoothDevicesArrayList = new ArrayList<BluetoothDevice>();
-    BluetoothSocket bluetoothSocket;
+    BluetoothSocket bluetoothSocket = HomeActivity.bluetoothSocket;
     OutputStream outputStream;
+    Thread bluetoothThread;
     BluetoothAdapter blueAdapter = BluetoothAdapter.getDefaultAdapter();
 
 
@@ -55,9 +51,12 @@ public class SettingsActivity extends AppCompatActivity {
         availableWifiList = (ListView) findViewById(R.id.availableWifiList);
         wifiPasswordEditText = (EditText) findViewById(R.id.wifiPasswordEditText);
         bluetoothListView = (ListView) findViewById(R.id.bluetoothListView);
-        enableBluetoothButton = (Button) findViewById(R.id.enableBluetoothButton);
+        bluetoothButton = (Button) findViewById(R.id.bluetoothButtonSettings);
 
-        bluetoothDevicesArray = availableBluetooth();
+
+        /////////BlueTooth
+        bluetoothDevicesArray = availableBluetooth(); // get all available bluetooth devices
+        // list all the available devices and set on item click
         if(bluetoothDevicesArray!= null) {
             bluetoothAdapter = new ArrayAdapter<String>(this, R.layout.settings_adapter, R.id.bluetoothName, bluetoothDevicesArray);
             bluetoothListView.setAdapter(bluetoothAdapter);
@@ -71,8 +70,12 @@ public class SettingsActivity extends AppCompatActivity {
                            sharedPref.edit().putString("bluetoothDeviceName", bluetoothDevicesArrayList.get(position).getName()).apply();
                             Toast.makeText(SettingsActivity.this,"Connected to "+ bluetoothDevicesArrayList.get(position).getName(),Toast.LENGTH_SHORT).show();
                            outputStream = bluetoothSocket.getOutputStream();
+                           bluetoothButton.setText("Disconnect");
+                           bluetoothButton.setVisibility(View.VISIBLE);
+                            bluetoothListView.setVisibility(View.GONE);
                             // isConnectedBluetooth.setText("Connected");
                             bluetoothAdapter.notifyDataSetChanged();
+                            HomeActivity.bluetoothSocket =bluetoothSocket;
                         }else {
                             Toast.makeText(SettingsActivity.this,"Failed to Connect to"+ bluetoothDevicesArrayList.get(position).getName(),Toast.LENGTH_SHORT).show();
                         }
@@ -82,43 +85,78 @@ public class SettingsActivity extends AppCompatActivity {
                 }
             });
         }
+        // check if the user is connected to display the disconnect button
+        try {
+            if (bluetoothSocket.isConnected()) {
+                outputStream = bluetoothSocket.getOutputStream();
+                bluetoothButton.setText("Disconnect");
+                bluetoothButton.setVisibility(View.VISIBLE);
+                bluetoothListView.setVisibility(View.GONE);
+            }
+        }catch (Exception e){}
 
-
-        enableBluetoothButton.setOnClickListener(new View.OnClickListener() {
+        bluetoothButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               if (blueAdapter.enable()){
-                   try {
-                       Thread.sleep(200);
-                   } catch (InterruptedException e) {
-                       e.printStackTrace();
-                   }
-                   Intent intent = getIntent();
-                   finish();
-                   startActivity(intent);
-               }
+                int s = 0;
+                switch(bluetoothButton.getText().toString()){
+                    case"Disconnect":
+                        try {
+                            bluetoothSocket.close();
+                            HomeActivity.bluetoothSocket = bluetoothSocket;
+                            bluetoothButton.setVisibility(View.GONE);
+                            bluetoothListView.setVisibility(View.VISIBLE);
+                            Toast.makeText(SettingsActivity.this,"Disconnected",Toast.LENGTH_SHORT).show();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case"Enable Bluetooth":
+                        if (blueAdapter.enable()){
+                            try {
+                                Thread.sleep(200);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            Intent intent = getIntent();
+                            finish();
+                            startActivity(intent);
+                        }
+                        break;
+                }
+
             }
         });
 
         wifiSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(wifiSwitch.getText().equals("Off") ) {
-                    wifiSwitch.setText("On");
-                    wifiListHeading.setVisibility(View.VISIBLE);
-                    availableWifiList.setVisibility(View.VISIBLE);
-                    wifiPasswordEditText.setVisibility(View.VISIBLE);
-                    wifiConnectButton.setVisibility(View.VISIBLE);
+                try {
+                    if (wifiSwitch.getText().equals("Off") && bluetoothSocket.isConnected()) {
+                        wifiSwitch.setText("On");
+                        writeToBluetooth("W");
+                        getWIFIName(bluetoothSocket);
 
-
-                }else{
-                    wifiSwitch.setText("Off");
-                   // Toast.makeText(SettingsActivity.this, "Please connect the car via Bluetooth first", Toast.LENGTH_SHORT).show();
-                    wifiListHeading.setVisibility(View.GONE);
-                    availableWifiList.setVisibility(View.GONE);
-                    wifiPasswordEditText.setVisibility(View.GONE);
-                    wifiConnectButton.setVisibility(View.GONE);
-
+                       // wifiAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.settings_adapter, R.id.bluetoothName, availableWifi);
+                        bluetoothThread.start();
+                        wifiListHeading.setVisibility(View.VISIBLE);
+                        availableWifiList.setVisibility(View.VISIBLE);
+                        wifiPasswordEditText.setVisibility(View.VISIBLE);
+                        wifiConnectButton.setVisibility(View.VISIBLE);
+                    } else if(wifiSwitch.getText().equals("On")) {
+                        wifiSwitch.setText("Off");
+                        wifiListHeading.setVisibility(View.GONE);
+                        availableWifiList.setVisibility(View.GONE);
+                        wifiPasswordEditText.setVisibility(View.GONE);
+                        wifiConnectButton.setVisibility(View.GONE);
+                        wifiSwitch.setChecked(false);
+                    }else{
+                        Toast.makeText(SettingsActivity.this, "Please connect the car via Bluetooth first", Toast.LENGTH_SHORT).show();
+                        wifiSwitch.setChecked(false);
+                    }
+                }catch (Exception e){
+                    Toast.makeText(SettingsActivity.this, "Please connect the car via Bluetooth first", Toast.LENGTH_SHORT).show();
+                    wifiSwitch.setChecked(false);
                 }
 
             }
@@ -130,7 +168,7 @@ public class SettingsActivity extends AppCompatActivity {
         String[] devicesName = new String[0];
         if (blueAdapter != null) {
             if (blueAdapter.isEnabled()) {
-                enableBluetoothButton.setVisibility(View.GONE);
+                bluetoothButton.setVisibility(View.GONE);
                 bluetoothListView.setVisibility(View.VISIBLE);
                 Set<BluetoothDevice> bondedDevices = blueAdapter.getBondedDevices();
                 if(bondedDevices.size() > 0) {
@@ -145,17 +183,53 @@ public class SettingsActivity extends AppCompatActivity {
                 return devicesName;
             } else {
                 bluetoothListView.setVisibility(View.GONE);
-                enableBluetoothButton.setVisibility(View.VISIBLE);
+                bluetoothButton.setVisibility(View.VISIBLE);
+                bluetoothButton.setText("Enable Bluetooth");
             }
         }
         return null;
     }
 
 
-    public void write(String s) throws IOException {
+    public void writeToBluetooth(String s) throws IOException {
         outputStream.write(s.getBytes());
     }
 
+    private void getWIFIName(BluetoothSocket bluetoothSocket){
+        final InputStream inputStream ;
+        InputStream tmpIn = null;
+        try {
+            tmpIn = bluetoothSocket.getInputStream();
+        } catch (IOException e) {}
+        inputStream = tmpIn;
+        bluetoothThread = new Thread() {
+            @Override
+            public void run() {
+                ArrayList<String> wifiName = new ArrayList<>();
+                String name = "";
+                while (true) {
+                    byte[] buffer = new byte[1];
+                    try {
+                        inputStream.read(buffer);            //read bytes from input buffer
+                        if(buffer[0]== 4)           //end of receiving data
+                            break;
+                        if((char)buffer[0] != 3) {  // if not end of the text
+                            if(buffer[0] != 0)      // don't add empty spaces
+                                name += (char) buffer[0];
+                        }else{
+                            wifiName.add(name);
+                            System.out.println(name);
+                            name = "";
+                        }
 
+
+                    } catch (Exception e) {
+                        break;
+                    }
+                }
+            }
+
+        };
+    }
 
 }

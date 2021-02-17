@@ -7,29 +7,32 @@ import matplotlib.pyplot as plt
 def make_coordinates(image,line_parameter):
     try:
         slope, intercept = line_parameter
-        print(slope)
+
     except TypeError:
         slope, intercept = -0.5, 0.1
     y1 = 625
     y2 = int(y1 * (0.80))
     x1 = int((y1 - intercept) / slope)
     x2 = int((y2 - intercept) / slope)
+    print(slope)
+    print(intercept)
     return np.array([x1, y1, x2, y2])
 
 
 def average_slope_intercept(image, lines):
     left_fit = []
     right_fit = []
-    for line in lines:
-        x1, y1, x2, y2 = line.reshape(4)
-        if y1 > 400 and y2 >400 and x1>200 and x2<800:
-            parameters = np.polyfit((x1, x2), (y1, y2), 1)
-            slope = parameters[0]
-            intercept = parameters[1]
-            if slope < 0:
-                left_fit.append((slope, intercept))
-            else:
-                right_fit.append((slope, intercept))
+    if lines is not None:
+        for line in lines:
+            x1, y1, x2, y2 = line.reshape(4)
+            if y1 > 400 and y2 > 400 and 550 < x1 < 800 and 550 < x2 < 800:
+                parameters = np.polyfit((x1, x2), (y1, y2), 1)
+                slope = parameters[0]
+                intercept = parameters[1]
+                if slope < 0:
+                    left_fit.append((slope, intercept))
+                else:
+                    right_fit.append((slope, intercept))
     left_fit_average = np.average(left_fit, axis=0)
     left_line = make_coordinates(image,left_fit_average)
     right_fit_average = np.average(right_fit, axis=0)
@@ -86,7 +89,7 @@ while (cap.isOpened()):
     _, frame = cap.read()
     gray = canny(frame)
     croppedImage = region_of_interest(gray)
-    lines = cv2.HoughLinesP(croppedImage, 2, np.pi / 180, 100, np.array([]), minLineLength=40, maxLineGap=20)
+    lines = cv2.HoughLinesP(croppedImage, 2, np.pi / 180, 150, np.array([]), minLineLength=12, maxLineGap=10)
     average_lines = average_slope_intercept(frame,lines)
     line_image = displayLines(frame, average_lines)
     comboImage = cv2.addWeighted(frame, 0.5, line_image, 1, 1)

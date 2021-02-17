@@ -48,13 +48,13 @@ public class ControlCar extends AppCompatActivity {
         backSensor = (TextView) findViewById(R.id.backSensorTextViewControlCar);
         leftSensor = (TextView) findViewById(R.id.leftSensorTextViewControlCar);
         rightSensor = (TextView) findViewById(R.id.rightSensorTextViewControlCar);
-        if(!bluetoothSocket.isConnected()){
-            Toast.makeText(ControlCar.this,"Please Connect to Car Using Bluetooth",Toast.LENGTH_SHORT).show();
-            finish();
-        }
 
-        getSensorsValue(bluetoothSocket);
-        bluetoothThread.start();
+
+            getSensorsValue(bluetoothSocket);
+            bluetoothThread.start();
+
+
+
 
         try {
             outputStream = bluetoothSocket.getOutputStream();
