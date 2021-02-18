@@ -49,8 +49,17 @@
             <ListView
                 android:id="@+id/availableWifiList"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="200dp"
                 android:background="#989898"
+                android:visibility="gone"/>
+            <TextView
+                android:id="@+id/chosenWifi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="WIFI"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:textSize="15dp"
                 android:visibility="gone"/>
             <EditText
                 android:id="@+id/wifiPasswordEditText"

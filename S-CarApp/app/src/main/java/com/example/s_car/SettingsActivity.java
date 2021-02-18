@@ -26,7 +26,7 @@ import java.util.Set;
 
 public class SettingsActivity extends AppCompatActivity {
     Switch wifiSwitch;
-    TextView wifiListHeading,isConnectedBluetooth ;
+    TextView wifiListHeading,isConnectedBluetooth,wifiTextView ;
     Button wifiConnectButton, bluetoothButton;
     ListView availableWifiList,bluetoothListView;
     EditText wifiPasswordEditText;
@@ -37,6 +37,7 @@ public class SettingsActivity extends AppCompatActivity {
     OutputStream outputStream;
     Thread bluetoothThread;
     BluetoothAdapter blueAdapter = BluetoothAdapter.getDefaultAdapter();
+    ArrayList<String> wifiName = new ArrayList<>();
 
 
     @Override
@@ -47,6 +48,7 @@ public class SettingsActivity extends AppCompatActivity {
         wifiSwitch = (Switch) findViewById(R.id.wifiSwitch);
         wifiConnectButton = (Button) findViewById(R.id.wifiConnectButton);
         wifiListHeading = (TextView) findViewById(R.id.wifiListHeading);
+        wifiTextView = (TextView) findViewById(R.id.chosenWifi);
         isConnectedBluetooth = (TextView) findViewById(R.id.isConnectedBluetoothTextView);
         availableWifiList = (ListView) findViewById(R.id.availableWifiList);
         wifiPasswordEditText = (EditText) findViewById(R.id.wifiPasswordEditText);
@@ -136,17 +138,14 @@ public class SettingsActivity extends AppCompatActivity {
                         wifiSwitch.setText("On");
                         writeToBluetooth("W");
                         getWIFIName(bluetoothSocket);
-
-                       // wifiAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.settings_adapter, R.id.bluetoothName, availableWifi);
                         bluetoothThread.start();
                         wifiListHeading.setVisibility(View.VISIBLE);
-                        availableWifiList.setVisibility(View.VISIBLE);
-                        wifiPasswordEditText.setVisibility(View.VISIBLE);
-                        wifiConnectButton.setVisibility(View.VISIBLE);
+                        wifiListHeading.setText("Searching....");
                     } else if(wifiSwitch.getText().equals("On")) {
                         wifiSwitch.setText("Off");
                         wifiListHeading.setVisibility(View.GONE);
                         availableWifiList.setVisibility(View.GONE);
+                        wifiTextView.setVisibility(View.GONE);
                         wifiPasswordEditText.setVisibility(View.GONE);
                         wifiConnectButton.setVisibility(View.GONE);
                         wifiSwitch.setChecked(false);
@@ -158,6 +157,33 @@ public class SettingsActivity extends AppCompatActivity {
                     Toast.makeText(SettingsActivity.this, "Please connect the car via Bluetooth first", Toast.LENGTH_SHORT).show();
                     wifiSwitch.setChecked(false);
                 }
+
+            }
+        });
+        availableWifiList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                availableWifiList.setVisibility(View.GONE);
+                wifiListHeading.setVisibility(View.GONE);
+                wifiTextView.setVisibility(View.VISIBLE);
+                wifiPasswordEditText.setVisibility(View.VISIBLE);
+                wifiConnectButton.setVisibility(View.VISIBLE);
+                wifiTextView.setText(wifiName.get(position));
+            }
+        });
+        wifiConnectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    writeToBluetooth("O");
+                    writeToBluetooth(wifiTextView.getText().toString());
+                    outputStream.write(3);
+                    writeToBluetooth(wifiPasswordEditText.getText().toString());
+                    outputStream.write(4);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
 
             }
         });
@@ -205,7 +231,7 @@ public class SettingsActivity extends AppCompatActivity {
         bluetoothThread = new Thread() {
             @Override
             public void run() {
-                ArrayList<String> wifiName = new ArrayList<>();
+
                 String name = "";
                 while (true) {
                     byte[] buffer = new byte[1];
@@ -213,7 +239,7 @@ public class SettingsActivity extends AppCompatActivity {
                         inputStream.read(buffer);            //read bytes from input buffer
                         if(buffer[0]== 4)           //end of receiving data
                             break;
-                        if((char)buffer[0] != 3) {  // if not end of the text
+                        if(buffer[0] != 3) {  // if not end of the text
                             if(buffer[0] != 0)      // don't add empty spaces
                                 name += (char) buffer[0];
                         }else{
@@ -221,15 +247,30 @@ public class SettingsActivity extends AppCompatActivity {
                             System.out.println(name);
                             name = "";
                         }
-
-
                     } catch (Exception e) {
                         break;
                     }
                 }
+                SettingsActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if(!wifiName.isEmpty()) {
+                        wifiListHeading.setText(wifiName.size()+" Available Wifi");
+                        availableWifiList.setVisibility(View.VISIBLE);
+                        wifiAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.settings_adapter, R.id.bluetoothName, wifiName);
+                        availableWifiList.setAdapter(wifiAdapter);
+                        wifiAdapter.notifyDataSetChanged();
+                    }else{
+                        wifiListHeading.setText("Couldn't Find WIFI");
+                    }
+                }
+            });
+
+
             }
 
         };
+
     }
 
 }
