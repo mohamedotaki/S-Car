@@ -58,6 +58,30 @@ void bluetooth(){
     case 'W':{
     scanNetworks();
     }break;
+    case 'O':{
+      String wifiName,wifiPass;
+      byte b;
+          while(true){
+             b = SerialBT.read();
+            if(b != 3)
+              wifiName += (char) b;
+              else{
+              while(true){
+                b = SerialBT.read();
+               if(b != 4)
+              wifiPass += (char) b;
+              else
+              break;
+              }
+              break; 
+              }
+          }
+          Serial.println(wifiPass);
+      
+      
+     // ConnectToWiFi("Otaki2.4G","moh1234512345");
+      break;
+    }
     
   }
  }
