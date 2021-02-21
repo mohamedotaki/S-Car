@@ -93,7 +93,7 @@ public class Register extends AppCompatActivity {
             User user = users[0];
             try {
                 ObjectInputStream ois = null;
-                URL url = new URL("http://192.168.1.5:8080/S_Car_Server_war_exploded/" + "Register");
+                URL url = new URL("http://192.168.1.26:8080/S_Car_Server_war_exploded/" + "Register");
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setDoOutput(true);
                 con.setDoInput(true);

@@ -261,7 +261,7 @@ public class SettingsActivity extends AppCompatActivity {
                         availableWifiList.setAdapter(wifiAdapter);
                         wifiAdapter.notifyDataSetChanged();
                     }else{
-                        wifiListHeading.setText("Couldn't Find WIFI");
+                        wifiListHeading.setText("No Networks Found");
                     }
                 }
             });

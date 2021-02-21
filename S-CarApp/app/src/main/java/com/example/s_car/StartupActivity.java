@@ -146,7 +146,7 @@ public class StartupActivity extends AppCompatActivity {
                 ObjectOutputStream os = null;
                 ObjectInputStream ois = null;
                 String line = null;
-                URL url = new URL("http://192.168.1.5:8080/S_Car_Server_war_exploded/" + "Login");
+                URL url = new URL("http://192.168.1.26:8080/S_Car_Server_war_exploded/" + "Login");
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setDoOutput(true);
                 con.setDoInput(true);
