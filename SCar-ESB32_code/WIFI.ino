@@ -18,7 +18,7 @@ void scanNetworks() {
 
 void ConnectToWiFi(const char *wifiName, const char *wifiPass)
 {
- 
+  WiFi.disconnect();
   WiFi.mode(WIFI_STA);
   WiFi.begin(wifiName, wifiPass);
   Serial.print("Connecting to "); Serial.println(wifiName);
@@ -29,12 +29,11 @@ void ConnectToWiFi(const char *wifiName, const char *wifiPass)
     Serial.print('.');
     delay(500);
  
-    if ((++i % 16) == 0)
+    if ((++i % 40) == 0)
     {
-      Serial.println(F(" still trying to connect"));
+      WiFi.disconnect();
+      Serial.println("Faild To Connect");
+      break;
     }
   }
- 
-  Serial.print(F("Connected. My IP address is: "));
-  Serial.println(WiFi.localIP());
 }
