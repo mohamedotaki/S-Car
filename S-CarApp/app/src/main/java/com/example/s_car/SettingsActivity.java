@@ -79,7 +79,7 @@ public class SettingsActivity extends AppCompatActivity {
                             bluetoothAdapter.notifyDataSetChanged();
                             HomeActivity.bluetoothSocket =bluetoothSocket;
                         }else {
-                            Toast.makeText(SettingsActivity.this,"Failed to Connect to"+ bluetoothDevicesArrayList.get(position).getName(),Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SettingsActivity.this,"Failed to Connect to "+ bluetoothDevicesArrayList.get(position).getName(),Toast.LENGTH_SHORT).show();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

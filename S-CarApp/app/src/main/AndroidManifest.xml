@@ -18,10 +18,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-
-
-        <activity
-            android:name=".AddDriversActivity"/>
+        <activity android:name=".AddEventActivity"></activity>
+        <activity android:name=".CalendarActivity" />
+        <activity android:name=".AddDriversActivity" />
         <activity android:name=".SettingsActivity" />
         <activity android:name=".DriversActivity" />
         <activity android:name=".ControlCar" />
