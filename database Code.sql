@@ -1,14 +1,15 @@
 USE scar
 ;
 
-
 drop TABLE if exists drivers
 ;
+
+drop TABLE if exists events
+;
+
 drop TABLE if exists owners
 ;
 
-drop TABLE if exists devices
-;
 drop TABLE if exists login
 ;
 
@@ -51,6 +52,18 @@ CREATE  table drivers (
 		constraint fk_drivers_owner foreign key (ownerId)
 		references owners (ownerId),
 	constraint pk_driverId PRIMARY key (driverId)
+) 
+;
+
+CREATE table events (
+	eventId int AUTO_INCREMENT,
+	ownerId INT NOT NULL,
+	title VARCHAR (100) NOT NULL,
+	address VARCHAR (100) NOT NULL ,
+	eventDate VARCHAR (100) NOT NULL ,
+		constraint fk_events_owner foreign key (ownerId)
+		references owners (ownerId),
+	constraint pk_eventsId PRIMARY key (eventId)
 ) 
 ;
 
