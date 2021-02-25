@@ -1,14 +1,28 @@
 package com.example.s_car;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Event {
+public class Event implements Serializable {
+    private static final long serialVersionUID = 6529685098267757690L;
     int id =0;
     String title ="";
-    Date date = null;
+    String date = "";
     String address1 ="";
     String town= "";
     String county ="";
+
+    public Event() {
+    }
+
+    public Event(int id, String title, String date, String address1, String town, String county) {
+        this.id = id;
+        this.title = title;
+        this.date = date;
+        this.address1 = address1;
+        this.town = town;
+        this.county = county;
+    }
 
     public int getId() {
         return id;
@@ -26,11 +40,11 @@ public class Event {
         this.title = title;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 

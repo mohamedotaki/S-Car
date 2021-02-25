@@ -29,7 +29,7 @@ import java.util.Date;
 import java.util.Set;
 
 public class HomeActivity extends AppCompatActivity {
-    Button controlButton, settingsButton,driversButton;
+    Button controlButton, settingsButton,driversButton,calendarButton;
     OutputStream outputStream;
     TextView timeLeft,accountType, userName;
     public static BluetoothSocket bluetoothSocket;
@@ -41,6 +41,7 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         controlButton = (Button)findViewById(R.id.controlButton);
+        calendarButton = (Button)findViewById(R.id.calendarButtonHomeActivity);
         settingsButton = (Button)findViewById(R.id.settingsButton);
         driversButton = (Button)findViewById(R.id.DriversButton);
         accountType = (TextView)findViewById(R.id.accountTypeTextViewHome);
@@ -93,6 +94,12 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
+        calendarButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                    goTo(CalendarActivity.class);
+            }
+        });
 
         controlButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,7 +122,7 @@ public class HomeActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.menu, menu);
-        menu.removeItem(R.id.addNewDriverButton);
+        menu.removeItem(R.id.addButtonMenu);
         return true;
     }
 

@@ -172,10 +172,6 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
             date.setText(datePickedFormat );
             this.datePicked = datePickedFormat;
         }
-
-
-
-
     }
 
     class addDriver extends AsyncTask<Driver , Void ,String> {

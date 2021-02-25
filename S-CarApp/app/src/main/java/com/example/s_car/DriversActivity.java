@@ -71,7 +71,7 @@ public class DriversActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
-            case R.id.addNewDriverButton:
+            case R.id.addButtonMenu:
                 Intent intent = new Intent(getApplicationContext(),AddDriversActivity.class);
                 startActivityForResult(intent,addDriverActivity);
                 return true;

@@ -70,7 +70,7 @@ public class EventViewAdapter extends BaseAdapter {
                 break;
             case HEADER:
                 TextView dateTextView = (TextView)view.findViewById(R.id.dateTextViewDateHeader);
-                dateTextView.setText("date here");
+                dateTextView.setText(eventsList.get(index).toString());
                 break;
         }
        return  view;
