@@ -40,6 +40,7 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
     String datePicked = "",timePicked ="";
     int hr=0,min=0;
     TimePickerDialog timePickerDialog;
+    Event event = new Event();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,13 +54,26 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
         calendarButton =findViewById(R.id.dateImageButtonAddEvent);
         addEvent = findViewById(R.id.addEventButtonAddEvent);
 
+        Intent intent = getIntent();
+        event.setId(intent.getIntExtra("eventId",0));
+        event.setTitle(intent.getStringExtra("eventTitle"));
+        event.setDate(intent.getStringExtra("eventDate"));
+        event.setTime(intent.getStringExtra("eventTime"));
+        event.setAddress1(intent.getStringExtra("eventAddress1"));
+        event.setTown(intent.getStringExtra("eventTown"));
+        event.setCounty( intent.getStringExtra("eventCounty"));
+        if(event.getId() != 0){
+            setEventToEdit();
+        }
+
+
         repeatDailySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
                     repeatDaily = true;
                     date.setText("");
-                    datePicked="";
+                    datePicked="Daily";
                     timePicked="";
 
                 }else{
@@ -93,19 +107,29 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
         addEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Event event = new Event();
                 try {
+                    event.setOwnerId(StartupActivity.oo.getId());
                     event.setTitle(Encryption.encrypt(eventTitle.getText().toString()));
                     event.setAddress1(Encryption.encrypt(address1.getText().toString()));
                     event.setTown(Encryption.encrypt(town.getText().toString()));
                     event.setCounty(Encryption.encrypt(county.getText().toString()));
-                    event.setDate(Encryption.encrypt(date.getText().toString()));
+                    event.setDate(Encryption.encrypt(datePicked));
+                    event.setTime(Encryption.encrypt(timePicked));
                 }catch (Exception e){}
                 new addEvent().execute(event);
             }
         });
 
 
+    }
+    public void setEventToEdit(){
+        eventTitle.setText(event.getTitle());
+        address1.setText(event.getAddress1());
+        town.setText(event.getTown());
+        county.setText(event.getCounty());
+        timePicked = event.getTime();
+        datePicked = event.getDate();
+        date.setText(datePicked+" at "+timePicked);
     }
 
     @Override
@@ -154,7 +178,6 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
                 con.setRequestProperty("Content-Type", "application/octet-stream");
 
                 os = new ObjectOutputStream(con.getOutputStream());
-                //os.write(StartupActivity.oo.id);
                 os.writeObject(event);
                 os.flush();
                 os.close();

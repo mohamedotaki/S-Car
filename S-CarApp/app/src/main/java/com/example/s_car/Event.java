@@ -1,13 +1,13 @@
 package com.example.s_car;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class Event implements Serializable {
-    private static final long serialVersionUID = 6529685098267757690L;
     int id =0;
+    int ownerId=0;
     String title ="";
     String date = "";
+    String time="";
     String address1 ="";
     String town= "";
     String county ="";
@@ -15,10 +15,12 @@ public class Event implements Serializable {
     public Event() {
     }
 
-    public Event(int id, String title, String date, String address1, String town, String county) {
+    public Event(int id, int ownerId, String title, String date, String time, String address1, String town, String county) {
         this.id = id;
+        this.ownerId = ownerId;
         this.title = title;
         this.date = date;
+        this.time = time;
         this.address1 = address1;
         this.town = town;
         this.county = county;
@@ -30,6 +32,14 @@ public class Event implements Serializable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(int ownerId) {
+        this.ownerId = ownerId;
     }
 
     public String getTitle() {
@@ -72,7 +82,31 @@ public class Event implements Serializable {
         this.county = county;
     }
 
-    public String getFullAddress(){
-        return address1+", "+town+", "+county+", "+"Ireland";
+    public String getTime() {
+        return time;
     }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getFullAddress(){
+        try {
+            String s ="";
+            s += Encryption.decrypt(address1);
+            s += ", ";
+            s += Encryption.decrypt(town);
+            s += ", ";
+            s += Encryption.decrypt(county);
+            s += ", ";
+            s += "Ireland";
+            System.out.printf("-----++++++___+==" + s);
+            return  s ;
+
+        }catch (Exception e){
+            return null;
+        }
+
+    }
+
 }

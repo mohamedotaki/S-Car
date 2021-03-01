@@ -1,10 +1,12 @@
 package com.example.s_car;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -43,7 +45,7 @@ public class EventViewAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int index, View view, ViewGroup viewGroup) {
+    public View getView(final int index, View view, ViewGroup viewGroup) {
         if(view == null){
             switch (getItemViewType(index)){
                 case EVENT:
@@ -63,11 +65,35 @@ public class EventViewAdapter extends BaseAdapter {
                 TextView eventTitle = (TextView)view.findViewById(R.id.eventTitleTextViewEventView);
                 TextView eventTime = (TextView)view.findViewById(R.id.eventTextViewEventView);
                 TextView eventLocation = (TextView)view.findViewById(R.id.eventLocationTextViewEventView);
+                ImageButton editButton = (ImageButton)view.findViewById(R.id.editButtonEventView);
+                try {
+                    eventTitle.setText(Encryption.decrypt(((Event)eventsList.get(index)).getTitle()));
+                    eventTime.setText(Encryption.decrypt(((Event)eventsList.get(index)).getTime()));
+                    eventLocation.setText((((Event)eventsList.get(index)).getFullAddress()));
+                    editButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            try {
+                                Intent intent = new Intent(context,AddEventActivity.class);
+                                intent.putExtra("eventId", ((Event) eventsList.get(index)).getId());
+                                intent.putExtra("eventTitle", Encryption.decrypt(((Event) eventsList.get(index)).getTitle()));
+                                intent.putExtra("eventDate", Encryption.decrypt(((Event) eventsList.get(index)).getDate()));
+                                intent.putExtra("eventTime", Encryption.decrypt(((Event) eventsList.get(index)).getTime()));
+                                intent.putExtra("eventAddress1", Encryption.decrypt(((Event) eventsList.get(index)).getAddress1()));
+                                intent.putExtra("eventTown", Encryption.decrypt(((Event) eventsList.get(index)).getTown()));
+                                intent.putExtra("eventCounty", Encryption.decrypt(((Event) eventsList.get(index)).getCounty()));
+                                context.startActivity(intent);
+                            }
+                            catch (Exception e){
 
-                eventTitle.setText(((Event)eventsList.get(index)).getTitle());
-                eventTime.setText(((Event)eventsList.get(index)).getDate().toString());
-                eventLocation.setText(((Event)eventsList.get(index)).getFullAddress());
-                break;
+                            }
+
+
+                        }
+                    });
+                    break;
+                }catch (Exception e){ break;}
+
             case HEADER:
                 TextView dateTextView = (TextView)view.findViewById(R.id.dateTextViewDateHeader);
                 dateTextView.setText(eventsList.get(index).toString());
