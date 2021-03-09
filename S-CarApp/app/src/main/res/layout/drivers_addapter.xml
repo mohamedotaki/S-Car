@@ -43,25 +43,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/driverNameTextViewAdapter" />
 
-    <Button
-        android:id="@+id/editDriverDriverActivity"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Edit Driver"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/validTillTextViewAdapter" />
-
-    <Button
-        android:id="@+id/deleteDriverDriverActivity"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Delete Driver"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editDriverDriverActivity" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

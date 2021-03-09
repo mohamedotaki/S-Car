@@ -29,7 +29,7 @@ import java.util.Date;
 import java.util.Set;
 
 public class HomeActivity extends AppCompatActivity {
-    Button controlButton, settingsButton,driversButton,calendarButton;
+    Button controlButton, settingsButton,driversButton,calendarButton,mapButton;
     OutputStream outputStream;
     TextView timeLeft,accountType, userName;
     public static BluetoothSocket bluetoothSocket;
@@ -41,6 +41,7 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         controlButton = (Button)findViewById(R.id.controlButton);
+        mapButton = (Button)findViewById(R.id.mapButtonHome);
         calendarButton = (Button)findViewById(R.id.calendarButtonHomeActivity);
         settingsButton = (Button)findViewById(R.id.settingsButton);
         driversButton = (Button)findViewById(R.id.DriversButton);
@@ -93,7 +94,12 @@ public class HomeActivity extends AppCompatActivity {
                 }else  Toast.makeText(HomeActivity.this, "Only Owners Have Access", Toast.LENGTH_SHORT).show();
             }
         });
-
+        mapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goTo(MapActivity.class);
+            }
+        });
         calendarButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,6 +129,7 @@ public class HomeActivity extends AppCompatActivity {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.menu, menu);
         menu.removeItem(R.id.addButtonMenu);
+        menu.removeItem(R.id.deleteButton);
         return true;
     }
 

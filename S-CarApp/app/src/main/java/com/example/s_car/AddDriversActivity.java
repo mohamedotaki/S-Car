@@ -9,9 +9,13 @@ import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -61,7 +65,14 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
         addImageButton = findViewById(R.id.imageButtonAddDriver);
         imageListView = findViewById(R.id.imageListViewAddDriver);
 
+        // set up the spinner values
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.add_driver_spinner, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        driverType.setAdapter(adapter);
 
+        // get selected driver from driver activity
+        getDriverToEdit();
 
         openDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,7 +110,7 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
                 if(!name.getText().toString().isEmpty() && !emailAddress.getText().toString().isEmpty()&&!phoneNumber.getText().toString().isEmpty()){
                     try {
                         if(driverType.getSelectedItem().toString().equalsIgnoreCase("Add Driver Without Time")){
-                            driver.setDrivingPermission(null);
+                            driver.setDrivingPermission("");
                         }else{
                             if(datePicked.isEmpty()) throw new Exception("Empty Date");
                             driver.setDrivingPermission(datePicked);
@@ -122,10 +133,8 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
 
 
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.add_driver_spinner, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        driverType.setAdapter(adapter);
+
+
 
         driverType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -146,12 +155,43 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
         });
     }
     public void setDriverForEdit(Driver driver){
-        addImageButton.setImageResource(driver.getImageId());
-        name.setText(driver.getName());
-        emailAddress.setText(driver.getEmailAddress());
-        phoneNumber.setText(driver.getPhoneNumber());
-        date.setText(driver.getDrivingPermission());
+        try {
+            this.driver.setId(driver.getId());
+            this.driver.setLoginID(driver.getLoginID());
+            choseImage = driver.getImageId();
+            addImageButton.setImageResource(driver.getImageId());
+            name.setText(Encryption.decrypt(driver.getName()));
+            emailAddress.setText(Encryption.decrypt(driver.getEmailAddress()));
+            phoneNumber.setText(Encryption.decrypt(driver.getPhoneNumber()));
+            addDriverButton.setText("Update Driver");
+            if(driver.getDrivingPermission().equalsIgnoreCase("")){
+                driverType.setSelection(1);
+            }else{
+                date.setText(driver.getDrivingPermission());
+            }
+        }catch (Exception e){
 
+        }
+
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu, menu);
+        menu.removeItem(R.id.addButtonMenu);
+        menu.removeItem(R.id.logoutButton);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.deleteButton:
+                if(driver.getId() != 0 && driver.getLoginID() !=0) {
+                    new deleteDriver().execute(driver);
+                }
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     String getEncryptedText(EditText text) throws Exception {
@@ -173,11 +213,21 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
             this.datePicked = datePickedFormat;
         }
     }
+    void getDriverToEdit(){
+        Intent intent = getIntent();
+        Bundle receivedData = intent.getExtras();
+        if(receivedData != null) {
+            Driver driverToEdit = (Driver) receivedData.getSerializable("Driver");
+            if (driverToEdit.getId() != 0) {
+                setDriverForEdit(driverToEdit);
+            }
+        }
+    }
 
-    class addDriver extends AsyncTask<Driver , Void ,String> {
+    class addDriver extends AsyncTask<Driver , Void ,Boolean> {
 
         @Override
-        protected String doInBackground(Driver... drivers) {
+        protected Boolean doInBackground(Driver... drivers) {
 
             Driver driver = drivers[0];
             try {
@@ -199,18 +249,61 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
                 os.close();
 
                 ois = new ObjectInputStream(con.getInputStream());
-                String result = (String) ois.readObject();
+                boolean result = ois.readBoolean();
                 return result;
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return null;
+            return false;
         }
 
         @Override
-        protected void onPostExecute(String s) {
-            Toast.makeText(AddDriversActivity.this, s, Toast.LENGTH_SHORT).show();
-            if(s.equalsIgnoreCase("Driver was added")){
+        protected void onPostExecute(Boolean result) {
+            if(result){
+                Toast.makeText(AddDriversActivity.this, "Done", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent();
+                setResult(Activity.RESULT_OK,intent);
+                finish();
+            }
+        }
+    }
+    class deleteDriver extends AsyncTask<Driver , Void ,Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Driver... drivers) {
+
+            Driver driver = drivers[0];
+            try {
+                ObjectOutputStream os = null;
+                ObjectInputStream ois = null;
+                String line = null;
+                URL url = new URL("http://192.168.1.26:8080/S_Car_Server_war_exploded/" + "DeleteDrivers");
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                con.setDoOutput(true);
+                con.setDoInput(true);
+                con.setUseCaches(false);
+                con.setDefaultUseCaches(false);
+                // Specify the content type that we will send binary data
+                con.setRequestProperty("Content-Type", "application/octet-stream");
+
+                os = new ObjectOutputStream(con.getOutputStream());
+                os.writeObject(driver);
+                os.flush();
+                os.close();
+
+                ois = new ObjectInputStream(con.getInputStream());
+                boolean result = ois.readBoolean();
+                return result;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if(result){
+                Toast.makeText(AddDriversActivity.this, "Done", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent();
                 setResult(Activity.RESULT_OK,intent);
                 finish();

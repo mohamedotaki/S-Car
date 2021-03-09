@@ -1,5 +1,6 @@
 package com.example.s_car;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 
@@ -10,6 +11,9 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -122,7 +126,30 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
 
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu, menu);
+        menu.removeItem(R.id.logoutButton);
+        menu.removeItem(R.id.addButtonMenu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.deleteButton:
+                if(event.getId() != 0) {
+                    new deleteEvent().execute(event);
+                }
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     public void setEventToEdit(){
+        addEvent.setText("Update Event");
         eventTitle.setText(event.getTitle());
         address1.setText(event.getAddress1());
         town.setText(event.getTown());
@@ -197,6 +224,47 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
                 Toast.makeText(AddEventActivity.this, "Event Inserted", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent();
                 setResult(Activity.RESULT_OK,intent);
+                finish();
+            }
+        }
+    }
+
+    class deleteEvent extends AsyncTask<Event , Void ,Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Event... events) {
+
+            Event event = events[0];
+            try {
+                ObjectOutputStream os = null;
+                ObjectInputStream ois = null;
+                String line = null;
+                URL url = new URL("http://192.168.1.26:8080/S_Car_Server_war_exploded/" + "DeleteEvent");
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                con.setDoOutput(true);
+                con.setDoInput(true);
+                con.setUseCaches(false);
+                con.setDefaultUseCaches(false);
+                // Specify the content type that we will send binary data
+                con.setRequestProperty("Content-Type", "application/octet-stream");
+
+                os = new ObjectOutputStream(con.getOutputStream());
+                os.writeObject(event);
+                os.flush();
+                os.close();
+
+                ois = new ObjectInputStream(con.getInputStream());
+                boolean result = ois.readBoolean();
+                return result;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if(result){
                 finish();
             }
         }

@@ -117,14 +117,18 @@ public class StartupActivity extends AppCompatActivity {
                 Manifest.permission.ACCESS_NETWORK_STATE,
                 Manifest.permission.ACCESS_WIFI_STATE,
                 Manifest.permission.BLUETOOTH,
-                Manifest.permission.BLUETOOTH_ADMIN};
+                Manifest.permission.BLUETOOTH_ADMIN,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.READ_PHONE_STATE};
         if (    ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[0]) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[1]) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[2]) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[3]) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[4]) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[5]) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[6]) == PackageManager.PERMISSION_GRANTED){
+                ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[6]) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[7]) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[8]) == PackageManager.PERMISSION_GRANTED){
         } else {
             ActivityCompat.requestPermissions(StartupActivity.this, permissions, per);
 

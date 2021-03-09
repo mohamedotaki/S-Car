@@ -12,4 +12,10 @@
         android:title="Logout"
         app:showAsAction="always"
         />
+    <item android:id="@+id/deleteButton"
+        android:icon="@drawable/delete_icon"
+        android:title="Logout"
+        app:showAsAction="always"
+        />
+
 </menu>

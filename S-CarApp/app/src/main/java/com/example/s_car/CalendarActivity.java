@@ -46,6 +46,7 @@ public class CalendarActivity extends AppCompatActivity implements Serializable 
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.menu, menu);
         menu.removeItem(R.id.logoutButton);
+        menu.removeItem(R.id.deleteButton);
         return true;
     }
 

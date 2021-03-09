@@ -30,10 +30,10 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class DriversActivity extends AppCompatActivity {
+    ArrayList<Driver> drivers;
     ListView driversListView;
     DriversAdapter driversAdapter;
-    Button deleteDriverButton,editDriverButton;
-    int addDriverActivity = 1;
+    int driversActivityRequestCode = 111;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,17 +42,18 @@ public class DriversActivity extends AppCompatActivity {
 
         ////////////////////
         driversListView = (ListView) findViewById(R.id.driversListView);
-        deleteDriverButton = (Button) findViewById(R.id.deleteDriverDriverActivity);
-        editDriverButton = (Button) findViewById(R.id.editDriverDriverActivity);
 
         new getDrivers().execute(StartupActivity.oo.id);
 
         driversListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                editDriverButton.setVisibility(View.VISIBLE);
-                deleteDriverButton.setVisibility(View.VISIBLE);
-
+                Driver driver = drivers.get(position);
+                Intent intent = new Intent(DriversActivity.this,AddDriversActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("Driver",driver);
+                intent.putExtras(bundle);
+                startActivityForResult(intent,driversActivityRequestCode);
 
             }
         });
@@ -65,6 +66,7 @@ public class DriversActivity extends AppCompatActivity {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.menu, menu);
         menu.removeItem(R.id.logoutButton);
+        menu.removeItem(R.id.deleteButton);
         return true;
     }
 
@@ -72,8 +74,8 @@ public class DriversActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.addButtonMenu:
-                Intent intent = new Intent(getApplicationContext(),AddDriversActivity.class);
-                startActivityForResult(intent,addDriverActivity);
+                Intent intent = new Intent(DriversActivity.this,AddDriversActivity.class);
+                startActivity(intent);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -82,7 +84,7 @@ public class DriversActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == addDriverActivity) {
+        if (requestCode == driversActivityRequestCode) {
             if(resultCode == Activity.RESULT_OK){
                 new getDrivers().execute(StartupActivity.oo.id);
             }
@@ -113,7 +115,7 @@ public class DriversActivity extends AppCompatActivity {
                 os.close();
 
                 ois = new ObjectInputStream(con.getInputStream());
-                ArrayList<Driver> drivers = new ArrayList<>();
+                drivers = new ArrayList<>();
                 while(true){
                     Driver driver = (Driver) ois.readObject();
                     if(driver.getId() == 0) break;
