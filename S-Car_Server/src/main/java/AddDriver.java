@@ -29,7 +29,7 @@ public class AddDriver extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        String mess = null;
+        boolean result = false;
         response.setContentType("application/octet-stream");
         InputStream in = request.getInputStream();
         ObjectInputStream ois = new ObjectInputStream(in);
@@ -39,7 +39,7 @@ public class AddDriver extends HttpServlet {
         try {
           Driver driver = (Driver) ois.readObject();
 
-            if(driver != null) {
+            if(driver != null && driver.getId() == 0) {
                 Class.forName( "com.mysql.cj.jdbc.Driver" );
                 Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar","root","root" );
                 PreparedStatement addToLogin = con.prepareStatement("Insert Into login  Values (null,?,?,false)", Statement.RETURN_GENERATED_KEYS);
@@ -63,24 +63,43 @@ public class AddDriver extends HttpServlet {
                     rs = addToDriver.executeUpdate();
                     addToDriver.close();
                     if(rs >0){
-                       mess = "Driver was added";
+                       result = true;
                     }else{
                         PreparedStatement delete = con.prepareStatement("DELETE FROM login  where loginId like ?");
                         delete.setInt(1,loginID);
-                        mess = "Nothing was added";
+                        result =false;
                     }
-                }else{
-                    mess = "Nothing was added";
                 }
                 addToLogin.close();
+                con.close();
+            }else if(driver != null && driver.getId() !=0){
+                Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar","root","root" );
+                PreparedStatement updateLogin = con.prepareStatement("UPDATE login  set password=? where loginId =?");
+                updateLogin.setString(1,"tochange");
+                updateLogin.setInt(2,driver.getLoginID());
+                updateLogin.executeUpdate();
+                PreparedStatement updateDriver = con.prepareStatement("update drivers  set fullName=?,phoneNumber=?" +
+                            ",keyNo=?,drivingPermission=?,imageId=? where driverId =?");
+                updateDriver.setString(1,driver.getName());
+                updateDriver.setString(2,driver.getPhoneNumber());
+                updateDriver.setString(3,driver.getCarKey());
+                updateDriver.setString(4,driver.getDrivingPermission());
+                updateDriver.setInt(5,driver.getImageId());
+                updateDriver.setInt(6,driver.getId());
+                updateDriver.executeUpdate() ;
+                result = true;
+
+                updateLogin.close();
+                updateDriver.close();
                 con.close();
             }
         }
         catch(Exception ex)        {
+            result = false;
             System.out.println(ex.toString());
         }
         finally {
-            oos.writeObject(mess);
+            oos.writeBoolean(result);
             oos.flush();
             oos.close();
         }
