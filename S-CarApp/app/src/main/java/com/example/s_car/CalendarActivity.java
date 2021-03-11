@@ -33,12 +33,25 @@ public class CalendarActivity extends AppCompatActivity implements Serializable 
     int addEventActivity =1;
     ListView eventsListView ;
     EventViewAdapter eventAdapter;
+    ArrayList<Object> finalEvents;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
         eventsListView = findViewById(R.id.eventsListViewCalenderActivity);
         new getEvents().execute(StartupActivity.oo.getId());
+        eventsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(finalEvents.get(position)instanceof Event){
+                    Intent intent = new Intent(CalendarActivity.this, AddEventActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("EventToEdit",(Event)finalEvents.get(position));
+                    intent.putExtras(bundle);
+                    startActivityForResult(intent,addEventActivity);
+                }
+            }
+        });
 
     }
     @Override
@@ -66,7 +79,8 @@ public class CalendarActivity extends AppCompatActivity implements Serializable 
 
         if (requestCode == addEventActivity) {
             if(resultCode == Activity.RESULT_OK){
-                //dp somthing if the event was added
+                new getEvents().execute(StartupActivity.oo.getId());
+                eventAdapter.notifyDataSetChanged();
             }
         }
     }//onActivityResult
@@ -116,7 +130,7 @@ public class CalendarActivity extends AppCompatActivity implements Serializable 
 
         @Override
         protected void onPostExecute(ArrayList<Event> events) {
-            ArrayList<Object> finalEvents = new ArrayList<>();
+            finalEvents = new ArrayList<>();
             Set<Date> dateSet = new LinkedHashSet<>();
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             String date="";

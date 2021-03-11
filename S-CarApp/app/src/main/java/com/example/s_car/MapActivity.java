@@ -10,6 +10,9 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -21,7 +24,9 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -49,25 +54,48 @@ public class MapActivity extends AppCompatActivity {
     double lon =0,lat=0;
     private MapView mMapView;
     private MapboxMap mMapboxMap;
+    Polyline oldPolyLine;
+    ImageButton searchButton;
+    EditText addressEditText;
+    FloatingActionButton sendDirectionsButton;
     private final LatLng HOME_LOCATION = new LatLng(53.766258, -8.781946);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MapQuest.start(getApplicationContext());
         setContentView(R.layout.activity_map);
-
-
+        searchButton = (ImageButton)findViewById(R.id.mapAddressSearchButton);
+        addressEditText = (EditText) findViewById(R.id.mapAddressEditText);
         mMapView = (MapView) findViewById(R.id.mapquestMapView);
+        sendDirectionsButton = (FloatingActionButton)findViewById(R.id.sendDirectionsToCarFloatingButton);
+
 
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
                 mMapboxMap = mapboxMap;
-                mMapView.setStreetMode();
+                mMapView.setNightMode();
                 mMapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(HOME_LOCATION, 14));
-                // create and add marker
-                CurrentLocation();
+            }
+        });
+
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!addressEditText.getText().toString().isEmpty()) {
+                    if(oldPolyLine != null){
+                        mMapboxMap.removePolyline(oldPolyLine);
+                    }
+                    CurrentLocation();
+                }
+            }
+        });
+
+        sendDirectionsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Send data to car
             }
         });
 
@@ -146,12 +174,12 @@ public class MapActivity extends AppCompatActivity {
                 PolylineOptions polyline = new PolylineOptions();
                 polyline.addAll(shapePoints)
                         .width(5)
-                        .color(Color.GRAY)
+                        .color(Color.GREEN)
                         .alpha((float)0.75);
 
                 // add the polyline to the map
-                mMapboxMap.addPolyline(polyline);
-
+                oldPolyLine = mMapboxMap.addPolyline(polyline);
+                sendDirectionsButton.setVisibility(View.VISIBLE);
                 // get map bounds
                 JSONObject bounds = new JSONObject(json)
                         .getJSONObject("route")
@@ -209,7 +237,7 @@ public class MapActivity extends AppCompatActivity {
                             Route route = new Route();
                             route.execute(
                                     lat + ", " + lon, // origin
-                                    "12 bracklaghboy, ballyhunis, co.mayo, ireland", // destination
+                                    addressEditText.getText().toString()+", Ireland", // destination
                                     "fastest" // type
                             );
                         }

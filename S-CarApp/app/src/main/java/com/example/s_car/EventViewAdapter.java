@@ -65,32 +65,32 @@ public class EventViewAdapter extends BaseAdapter {
                 TextView eventTitle = (TextView)view.findViewById(R.id.eventTitleTextViewEventView);
                 TextView eventTime = (TextView)view.findViewById(R.id.eventTextViewEventView);
                 TextView eventLocation = (TextView)view.findViewById(R.id.eventLocationTextViewEventView);
-                ImageButton editButton = (ImageButton)view.findViewById(R.id.editButtonEventView);
+               // ImageButton editButton = (ImageButton)view.findViewById(R.id.editButtonEventView);
                 try {
                     eventTitle.setText(Encryption.decrypt(((Event)eventsList.get(index)).getTitle()));
                     eventTime.setText(Encryption.decrypt(((Event)eventsList.get(index)).getTime()));
                     eventLocation.setText((((Event)eventsList.get(index)).getFullAddress()));
-                    editButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            try {
-                                Intent intent = new Intent(context,AddEventActivity.class);
-                                intent.putExtra("eventId", ((Event) eventsList.get(index)).getId());
-                                intent.putExtra("eventTitle", Encryption.decrypt(((Event) eventsList.get(index)).getTitle()));
-                                intent.putExtra("eventDate", Encryption.decrypt(((Event) eventsList.get(index)).getDate()));
-                                intent.putExtra("eventTime", Encryption.decrypt(((Event) eventsList.get(index)).getTime()));
-                                intent.putExtra("eventAddress1", Encryption.decrypt(((Event) eventsList.get(index)).getAddress1()));
-                                intent.putExtra("eventTown", Encryption.decrypt(((Event) eventsList.get(index)).getTown()));
-                                intent.putExtra("eventCounty", Encryption.decrypt(((Event) eventsList.get(index)).getCounty()));
-                                context.startActivity(intent);
-                            }
-                            catch (Exception e){
-
-                            }
-
-
-                        }
-                    });
+//                    editButton.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            try {
+//                                Intent intent = new Intent(context,AddEventActivity.class);
+//                                intent.putExtra("eventId", ((Event) eventsList.get(index)).getId());
+//                                intent.putExtra("eventTitle", Encryption.decrypt(((Event) eventsList.get(index)).getTitle()));
+//                                intent.putExtra("eventDate", Encryption.decrypt(((Event) eventsList.get(index)).getDate()));
+//                                intent.putExtra("eventTime", Encryption.decrypt(((Event) eventsList.get(index)).getTime()));
+//                                intent.putExtra("eventAddress1", Encryption.decrypt(((Event) eventsList.get(index)).getAddress1()));
+//                                intent.putExtra("eventTown", Encryption.decrypt(((Event) eventsList.get(index)).getTown()));
+//                                intent.putExtra("eventCounty", Encryption.decrypt(((Event) eventsList.get(index)).getCounty()));
+//                                context.startActivity(intent);
+//                            }
+//                            catch (Exception e){
+//
+//                            }
+//
+//
+//                        }
+//                    });
                     break;
                 }catch (Exception e){ break;}
 

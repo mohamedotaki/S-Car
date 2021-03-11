@@ -59,15 +59,12 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
         addEvent = findViewById(R.id.addEventButtonAddEvent);
 
         Intent intent = getIntent();
-        event.setId(intent.getIntExtra("eventId",0));
-        event.setTitle(intent.getStringExtra("eventTitle"));
-        event.setDate(intent.getStringExtra("eventDate"));
-        event.setTime(intent.getStringExtra("eventTime"));
-        event.setAddress1(intent.getStringExtra("eventAddress1"));
-        event.setTown(intent.getStringExtra("eventTown"));
-        event.setCounty( intent.getStringExtra("eventCounty"));
-        if(event.getId() != 0){
-            setEventToEdit();
+        Bundle receivedData = intent.getExtras();
+        if(receivedData != null) {
+            event = (Event) receivedData.getSerializable("EventToEdit");
+            if (event.getId() != 0) {
+                setEventToEdit(event);
+            }
         }
 
 
@@ -148,15 +145,20 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
         return super.onOptionsItemSelected(item);
     }
 
-    public void setEventToEdit(){
+    public void setEventToEdit(Event event){
         addEvent.setText("Update Event");
-        eventTitle.setText(event.getTitle());
-        address1.setText(event.getAddress1());
-        town.setText(event.getTown());
-        county.setText(event.getCounty());
-        timePicked = event.getTime();
-        datePicked = event.getDate();
-        date.setText(datePicked+" at "+timePicked);
+        try {
+            eventTitle.setText(Encryption.decrypt(event.getTitle()));
+            address1.setText(Encryption.decrypt(event.getAddress1()));
+            town.setText(Encryption.decrypt(event.getTown()));
+            county.setText(Encryption.decrypt(event.getCounty()));
+            timePicked = Encryption.decrypt(event.getTime());
+            datePicked = Encryption.decrypt(event.getDate());
+            date.setText(datePicked+" at "+timePicked);
+        }catch (Exception e){
+
+        }
+
     }
 
     @Override
