@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Users\mohot\Desktop\FYP\Lane Detection Code\venv
+set VIRTUAL_ENV=C:\Users\mohot\Desktop\Final Year Project\S-Car\Lane Detection Code\venv
 
 if not defined PROMPT set PROMPT=$P$G
 

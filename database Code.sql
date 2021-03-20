@@ -60,7 +60,10 @@ CREATE table events (
 	ownerId INT NOT NULL,
 	title VARCHAR (100) NOT NULL,
 	address VARCHAR (100) NOT NULL ,
-	eventDate VARCHAR (100) NOT NULL ,
+	town VARCHAR (100) NOT NULL ,
+	county VARCHAR (100) NOT NULL ,
+	eventDate VARCHAR(100) NOT NULL ,
+	eventTime VARCHAR(100) NOT NULL ,
 		constraint fk_events_owner foreign key (ownerId)
 		references owners (ownerId),
 	constraint pk_eventsId PRIMARY key (eventId)

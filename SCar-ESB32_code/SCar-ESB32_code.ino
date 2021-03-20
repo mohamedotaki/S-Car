@@ -14,7 +14,7 @@
 
 BluetoothSerial SerialBT;
 static EventGroupHandle_t  xEventGroup;
-TaskHandle_t task1Handle = NULL, ultrasonicTaskHandle = NULL;
+TaskHandle_t task1Handle = NULL, ultrasonicTaskHandle = NULL, powerManagementTaskHandle = NULL;
 
 //no changes
 // Servo
@@ -42,7 +42,11 @@ int  carLength = 50; // car length is 41cm and 9cm for safty
 //wifi
 String wifiName, wifiPass;
 
+//Power
+int timeToSleep=0;
+
 void mainTask( void *pvParameters );
+void powerManagementTask( void *pvParameters );
 //void wifiTask( void *pvParameters );
 
 void setup() {
@@ -72,6 +76,7 @@ void setup() {
   xEventGroup  =  xEventGroupCreate();
   xTaskCreatePinnedToCore(mainTask, "mainTask", 3000, NULL, 3, &task1Handle, 0);
   xTaskCreatePinnedToCore(ultrasonicTask, "ultrasonicTask", 500, NULL, 3, &ultrasonicTaskHandle, 1);
+  xTaskCreatePinnedToCore(powerManagementTask, "powerManagementTask", 200, NULL, 3, &powerManagementTaskHandle, 1);
   vTaskSuspend(ultrasonicTaskHandle);
   /////////////////////////////////////////////////////////
   pinMode(26, INPUT);
@@ -164,6 +169,16 @@ void ultrasonicTask(void *pvParameters)
 
     vTaskDelay(10);
 
+  }
+}
+
+void powerManagementTask(void *pvParameters)
+{
+  for (;;)
+  {
+
+
+    vTaskDelay(10);
   }
 }
 

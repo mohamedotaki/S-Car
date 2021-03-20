@@ -27,7 +27,7 @@ function global:deactivate ([switch]$NonDestructive) {
 
 deactivate -nondestructive
 
-$env:VIRTUAL_ENV="C:\Users\mohot\Desktop\FYP\Lane Detection Code\venv"
+$env:VIRTUAL_ENV="C:\Users\mohot\Desktop\Final Year Project\S-Car\Lane Detection Code\venv"
 
 if (! $env:VIRTUAL_ENV_DISABLE_PROMPT) {
     # Set the prompt to include the env name

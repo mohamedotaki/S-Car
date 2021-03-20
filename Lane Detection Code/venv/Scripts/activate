@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\mohot\Desktop\FYP\Lane Detection Code\venv"
+VIRTUAL_ENV="C:\Users\mohot\Desktop\Final Year Project\S-Car\Lane Detection Code\venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

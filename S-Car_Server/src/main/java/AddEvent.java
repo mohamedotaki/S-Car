@@ -48,8 +48,8 @@ public class AddEvent extends HttpServlet {
                 addToEvents.close();
                 con.close();
             }else if(event != null && event.getId() != 0){
-                PreparedStatement updateEvent = con.prepareStatement("UPDATE events  set title =?, address=?,\" +\n" +
-                        "                        \"town=?,county=?,eventDate=?,eventTime=? where eventId =?");
+                PreparedStatement updateEvent = con.prepareStatement("UPDATE events  set title =?, address=?," +
+                        "town=?,county=?,eventDate=?,eventTime=? where eventId =?");
                 updateEvent.setString(1,event.getTitle());
                 updateEvent.setString(2,event.getAddress1());
                 updateEvent.setString(3,event.getTown());
