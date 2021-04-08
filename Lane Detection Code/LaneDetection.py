@@ -14,6 +14,7 @@ def make_coordinates(image, line_parameter):
     y2 = int(y1 * (0.80))
     x1 = int((y1 - intercept) / slope)
     x2 = int((y2 - intercept) / slope)
+    
     return np.array([x1, y1, x2, y2])
 
 
@@ -27,7 +28,6 @@ def average_slope_intercept(image, lines):
             parameters = np.polyfit((x1, x2), (y1, y2), 1)
             slope = parameters[0]
             intercept = parameters[1]
-            print(x1)
             if slope < 0:
                 left_fit.append((slope, intercept))
             else:
@@ -68,7 +68,7 @@ def displayLines(image, lines):
             intercept = parameters[1]
            # if y2 > 580 and 100 < x2 < 400 or 1000 < x2 < 1200 and 250 < x1 < 650 or 650 < x1 < 1200 and slope is not 0 and intercept < 700 or intercept >700 :
             cv2.line(line_image, (x1, y1), (x2, y2), (0, 255, 0), 8)
-                # cv2.line(line_image, (725, 400), (725, 650), (255, 0, 0), 8)
+            # cv2.line(line_image, (725, 400), (725, 650), (255, 0, 0), 8)
 
         return line_image
 
