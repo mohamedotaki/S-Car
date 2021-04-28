@@ -42,7 +42,7 @@ void bluetooth() {
                   break;
                 case 'P':         // go forward or increase the speed
                   Serial.println("parking assist");
-                  //parkingAssist();
+                  parkingAssist();
                   break;
                 case 'W':         // go forward or increase the speed
                   Serial.println("Wifi");
