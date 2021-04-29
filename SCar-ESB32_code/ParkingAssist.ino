@@ -2,10 +2,11 @@ int  steering=1500 ,currentPos=0, emptySpace=0;
 
 
 void parkingAssist(){
-  
+  vTaskResume(ultrasonicTaskHandle);
     searchForEmptySpace();
     //fixPosition();
     park();
+  vTaskSuspend(ultrasonicTaskHandle);
 }
 void searchForEmptySpace(){
   

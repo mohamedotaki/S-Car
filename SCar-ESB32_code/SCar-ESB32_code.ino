@@ -77,10 +77,10 @@ void setup() {
   // Tasks
   xEventGroup  =  xEventGroupCreate();
   xTaskCreatePinnedToCore(mainTask, "mainTask", 3000, NULL, 3, &task1Handle, 0);
-  //xTaskCreatePinnedToCore(ultrasonicTask, "ultrasonicTask", 500, NULL, 3, &ultrasonicTaskHandle, 1);
+  xTaskCreatePinnedToCore(ultrasonicTask, "ultrasonicTask", 3000, NULL, 3, &ultrasonicTaskHandle, 1);
   //xTaskCreatePinnedToCore(powerManagementTask, "powerManagementTask", 200, NULL, 3, &powerManagementTaskHandle, 1);
   //vTaskSuspend(ultrasonicTaskHandle);
-   // vTaskSuspend(task1Handle);
+  //vTaskSuspend(task1Handle);
   /////////////////////////////////////////////////////////
 //  pinMode(26, INPUT);
 //  pinMode(25, INPUT);
@@ -102,40 +102,6 @@ void setup() {
 }
 
 void loop() {
-  //
-  //f=ultrasonicValue(frontSensor);
-  //b=ultrasonicValue(backSensor);
-  //rfs=ultrasonicValue(rightSensorF);
-  //r=ultrasonicValue(rightSensorB);
-  //Serial.print ("\n");
-  //Serial.print (f);
-  //Serial.print ("  -  ");
-  //Serial.print (r);
-  //Serial.print ("  -  ");
-  //Serial.print (rfs);
-  //Serial.print ("  -  ");
-  //Serial.print (b);
-  //Serial.print ("\n");
-  //
-  delay(2000);
-  Serial.print("left");
-  maxLeftServo();
-  delay(2000);
-  Serial.print("center");
-  centerServo();
-  delay(2000);
-  Serial.print("Right");
-  maxRightServo();
-  delay(2000);
-   Serial.print("center");
-  centerServo();
-
-
-
-
-
-
-
 
   //////motorF(1700);
   //Serial.print(pulseIn(26,LOW));
@@ -145,10 +111,9 @@ void loop() {
   //Serial.print(pulseIn(25,LOW));
   //Serial.print("--");
   //Serial.println(pulseIn(25,HIGH));
+//xEventGroupSetBits(xEventGroup, frontSensorBit);
 
-
-
-
+//delay(500);
 
 
 }
@@ -158,21 +123,22 @@ void ultrasonicTask(void *pvParameters)
   EventBits_t xEventGroupValue;
   for (;;)
   {
-    Serial.print("uuuuuuuuuuuuuuuuuuu");
     xEventGroupValue  = xEventGroupWaitBits(xEventGroup, allSensorBits , pdTRUE, pdFALSE, portMAX_DELAY );
     if ((xEventGroupValue & frontSensorBit) != 0) {
       f = ultrasonicValue(frontSensor);
-      Serial.print(f);
+      Serial.println(f);
     }
     if ((xEventGroupValue & backSensorBit) != 0) {
       b = ultrasonicValue(backSensor);
+      Serial.println(b);
     }
     if ((xEventGroupValue & leftSensorBit) != 0) {
       rfs = ultrasonicValue(rightSensorF);
+      Serial.print(rfs);
     }
     if ((xEventGroupValue & rightSensorBit) != 0) {
       r = ultrasonicValue(rightSensorB);
-      Serial.print(r);
+      Serial.println(r);
     }
 
     vTaskDelay(10);
@@ -195,11 +161,11 @@ void mainTask(void *pvParameters)
   for (;;)
   {
     bluetooth();
-    // int aa=0;
-    // if(aa ==0){
-    //   xEventGroupSetBits(xEventGroup, frontSensorBit | rightSensorBit);
-    //aa++;
-    // }
+     int aa=0;
+     if(aa ==0){
+       xEventGroupSetBits(xEventGroup, frontSensorBit | rightSensorBit);
+    aa++;
+     }
 
 
 

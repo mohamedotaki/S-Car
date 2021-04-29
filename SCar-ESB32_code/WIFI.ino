@@ -1,5 +1,5 @@
-void scanNetworks() {
- 
+void scanNetworks() 
+{
   int numberOfNetworks = WiFi.scanNetworks();
  
   Serial.print("Number of networks found: ");
@@ -36,4 +36,12 @@ void ConnectToWiFi(const char *wifiName, const char *wifiPass)
       break;
     }
   }
+}
+
+void listenForChanges(){
+  while(WiFi.status() == WL_CONNECTED){
+    
+    
+  }
+  
 }
