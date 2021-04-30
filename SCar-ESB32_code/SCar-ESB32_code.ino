@@ -30,8 +30,8 @@ const int escSignal = 12;
 //UltraSonic pin No
 const int frontSensor = 2;
 const int backSensor = 0;
-const int rightSensorB = 16;
-const int rightSensorF = 4;
+const int rightSensorB = 4;
+const int rightSensorF = 16;
 int BTSteering = 1500;
 int f, b, rfs, r;
 
@@ -126,18 +126,22 @@ void ultrasonicTask(void *pvParameters)
     xEventGroupValue  = xEventGroupWaitBits(xEventGroup, allSensorBits , pdTRUE, pdFALSE, portMAX_DELAY );
     if ((xEventGroupValue & frontSensorBit) != 0) {
       f = ultrasonicValue(frontSensor);
+      Serial.print("Front :");
       Serial.println(f);
     }
     if ((xEventGroupValue & backSensorBit) != 0) {
       b = ultrasonicValue(backSensor);
+      Serial.print("Back: ");
       Serial.println(b);
     }
     if ((xEventGroupValue & leftSensorBit) != 0) {
       rfs = ultrasonicValue(rightSensorF);
-      Serial.print(rfs);
+      Serial.print("Right Top: ");
+      Serial.println(rfs);
     }
     if ((xEventGroupValue & rightSensorBit) != 0) {
       r = ultrasonicValue(rightSensorB);
+      Serial.print("Right Bottom: ");
       Serial.println(r);
     }
 
@@ -161,11 +165,11 @@ void mainTask(void *pvParameters)
   for (;;)
   {
     bluetooth();
-     int aa=0;
-     if(aa ==0){
-       xEventGroupSetBits(xEventGroup, frontSensorBit | rightSensorBit);
-    aa++;
-     }
+//     int aa=0;
+//     if(aa ==0){
+//   xEventGroupSetBits(xEventGroup, frontSensorBit | rightSensorBit | leftSensorBit | backSensorBit);
+//    aa++;
+//     }
 
 
 

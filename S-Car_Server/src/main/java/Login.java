@@ -21,7 +21,7 @@ public class Login extends HttpServlet {
             ipAddress = request.getRemoteAddr();
         }
 
-
+        System.out.println("1");
          int result;
          response.setContentType("application/octet-stream");
          InputStream in = request.getInputStream();
@@ -29,13 +29,15 @@ public class Login extends HttpServlet {
          OutputStream outstr = response.getOutputStream();
          ObjectOutputStream oos = new ObjectOutputStream(outstr);
 
+         System.out.println("2");
+
          try {
             String email = ois.readObject().toString();
              String pass = ois.readObject().toString();
              System.out.println(email +"\n"+pass);
             if(!email.isEmpty() && !pass.isEmpty()) {
                 Class.forName( "com.mysql.cj.jdbc.Driver" );
-                Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar","root","root" );
+                Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar?serverTimezone=UTC","root","root" );
                 PreparedStatement checkLogin = con.prepareStatement("SELECT loginId, isOwner FROM login where email like ? and password like ?");
                 checkLogin.setString(1, email);
                 checkLogin.setString(2, pass);

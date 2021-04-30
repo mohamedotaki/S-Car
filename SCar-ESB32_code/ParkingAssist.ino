@@ -8,77 +8,36 @@ void parkingAssist(){
     park();
   vTaskSuspend(ultrasonicTaskHandle);
 }
+
 void searchForEmptySpace(){
-  
   int safeDis=0;
   boolean readyToPark = false;
   centerServo();
-  r=ultrasonicValue(rightSensorB);
-  rfs=ultrasonicValue(rightSensorF);
-  f=ultrasonicValue(frontSensor);
-  b=ultrasonicValue(backSensor);
-    Serial.print(r);
-    Serial.print("-r");
-    Serial.print(rfs);
-    Serial.print("-rf");
-    Serial.print(f);
-    Serial.print("-f");
-    Serial.print(b);
-    Serial.println("-b");
-    while(r<carWidth || rfs <carWidth || r>carWidth || rfs > carWidth && f > 20){
-        if(f<15){
-        break;
-        }
-       Serial.println("11111 while");
-      r=ultrasonicValue(rightSensorB);
-      rfs=ultrasonicValue(rightSensorF);
-      f=ultrasonicValue(frontSensor);
-      b=ultrasonicValue(backSensor);
-      int back=b , front = f;
+  xEventGroupSetBits(xEventGroup, frontSensorBit | rightSensorBit | leftSensorBit);
       safeDis=0;
       motorF(forwardSpeed);
-    while(r>carWidth && rfs > carWidth){
-      Serial.println("firstwhile");
+      int back=b , front = f;
+      while(f >20){
+    while(r>carWidth && rfs > carWidth && f >20){
+      Serial.println("Clauclating empty space");
       if(r>carWidth && rfs > carWidth) {
-        safeDis = 24; // 24cm as the sensors can detect 24cm of the car length
-      }else safeDis=0;
-        b=ultrasonicValue(backSensor);
-        f=ultrasonicValue(frontSensor);
-
-        if(f<15){
-          Serial.println("f<10");
-          break;
+        safeDis =+ 24; // 24cm as the sensors can detect 24cm of the car length
+        if(safeDis > 50){
+        readyToPark =true;
+        Serial.println("ready to park");
         }
-        if(front-f >45 || b-back>45){
-            safeDis = safeDis +36;              // park without fix the car pos
-            readyToPark =true;
-            Serial.println("ready to park");
-            break;
+      } 
+      else {
+        safeDis=0;
         }
-         b=ultrasonicValue(backSensor);
-         f=ultrasonicValue(frontSensor);
-        r=ultrasonicValue(rightSensorB);
-        rfs=ultrasonicValue(rightSensorF);
-        if(r<carWidth || rfs < carWidth && front-f >26 || b-back>26){
-          Serial.println("not ready prep");
-          b=ultrasonicValue(backSensor);
-          f=ultrasonicValue(frontSensor);
-          front =f;   back = b;
-          while(front -f <35 || b - back <35){
-            Serial.println("bbbbbbbbb");
-          b=ultrasonicValue(backSensor);
-          f=ultrasonicValue(frontSensor);
-          readyToPark =true;
-          }
-          
-        }
- 
-            
+        delay(100);         
   if(readyToPark)break;
 
       }
-  if(readyToPark)break;
- }
+       if(readyToPark)break;
+}
+ 
+ 
  motorS();     
     
 }
@@ -130,12 +89,8 @@ void park(){
   motorS(); 
  int currentPos=0,steering=0;
  boolean parked=false;
-     rfs=ultrasonicValue(rightSensorF);
       currentPos = rfs;
 while(true){
-  f=ultrasonicValue(frontSensor);
-  rfs=ultrasonicValue(rightSensorF);
-  b=ultrasonicValue(backSensor);
    steering = map(rfs, currentPos, currentPos+10, 1100, 1900);
    if(steering>1600){
     steering = 1900;
