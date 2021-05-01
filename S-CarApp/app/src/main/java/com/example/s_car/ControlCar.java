@@ -1,40 +1,18 @@
 package com.example.s_car;
 
-import androidx.activity.OnBackPressedCallback;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothHeadset;
-import android.bluetooth.BluetoothProfile;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.ParcelUuid;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.android.gms.common.util.Strings;
-
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Set;
 
 public class ControlCar extends AppCompatActivity {
     TextView frontSensor, backSensor, leftSensor, rightSensor;
@@ -43,7 +21,7 @@ public class ControlCar extends AppCompatActivity {
     ImageButton forwardButton, leftButton, rightButton, reverseButton, parkingAssistButton, autoPilotButton;
     BluetoothSocket bluetoothSocket = HomeActivity.bluetoothSocket;
     OutputStream outputStream;
-    Thread bluetoothThread;
+    boolean bluetoothThread = true;
 
 
     @Override
@@ -57,10 +35,10 @@ public class ControlCar extends AppCompatActivity {
         reverseButton = findViewById(R.id.bottomArrow);
         stop = findViewById(R.id.StopButton);
         autoPilotButton = findViewById(R.id.autoPilotButton);
-        frontSensor = (TextView) findViewById(R.id.frontSensorTextViewControlCar);
-        backSensor = (TextView) findViewById(R.id.backSensorTextViewControlCar);
-        leftSensor = (TextView) findViewById(R.id.leftSensorTextViewControlCar);
-        rightSensor = (TextView) findViewById(R.id.rightSensorTextViewControlCar);
+        frontSensor =  findViewById(R.id.frontSensorTextViewControlCar);
+        backSensor =  findViewById(R.id.backSensorTextViewControlCar);
+        leftSensor =  findViewById(R.id.leftSensorTextViewControlCar);
+        rightSensor = findViewById(R.id.rightSensorTextViewControlCar);
 
 
 
@@ -76,9 +54,16 @@ public class ControlCar extends AppCompatActivity {
             finish();
         }
         autoPilotButton.setOnClickListener(new View.OnClickListener() {
+            boolean autoPilotOnOff =true;
             @Override
             public void onClick(View v) {
-                autoPilotButton.setImageResource(R.drawable.auto_pilot_on);
+                if(autoPilotOnOff){
+                    autoPilotButton.setImageResource(R.drawable.auto_pilot_on);
+                    autoPilotOnOff = false;
+                }else {
+                    autoPilotButton.setImageResource(R.drawable.auto_pilot);
+                    autoPilotOnOff = true;
+                }
                 try {
                     write("A");
                 } catch (IOException e) {
@@ -149,6 +134,30 @@ public class ControlCar extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        try {
+            write("E");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        bluetoothThread = false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        bluetoothThread = true;
+        try {
+            write("C");
+            getSensorsValue(bluetoothSocket);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public void write(String s) throws IOException {
         outputStream.write(s.getBytes());
     }
@@ -157,6 +166,7 @@ public class ControlCar extends AppCompatActivity {
     public void onBackPressed() {
         try {
             write("E");
+            bluetoothThread = false;
         } catch (IOException e) {
         }
 
