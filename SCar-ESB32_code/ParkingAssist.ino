@@ -13,12 +13,14 @@ void searchForEmptySpace(){
   int safeDis=0;
   boolean readyToPark = false;
   centerServo();
-  xEventGroupSetBits(xEventGroup, frontSensorBit | rightSensorBit | leftSensorBit);
+         xEventGroupSetBits(xEventGroup, frontSensorBit | rightSensorBit | leftSensorBit);
       safeDis=0;
       motorF(forwardSpeed);
       int back=b , front = f;
       while(f >20){
+ 
     while(r>carWidth && rfs > carWidth && f >20){
+
       Serial.println("Clauclating empty space");
       if(r>carWidth && rfs > carWidth) {
         safeDis =+ 24; // 24cm as the sensors can detect 24cm of the car length
@@ -39,7 +41,7 @@ void searchForEmptySpace(){
  
  
  motorS();     
-    
+                   xEventGroupClearBits(xEventGroup, allSensorBits);
 }
 //void fixPosition(){
 //     r=ultrasonicValue(rightSensorB);
@@ -87,10 +89,11 @@ void searchForEmptySpace(){
 void park(){
   delay(1000);
   motorS(); 
+    xEventGroupSetBits(xEventGroup, allSensorBits);
  int currentPos=0,steering=0;
  boolean parked=false;
       currentPos = rfs;
-while(true){
+while(true){          
    steering = map(rfs, currentPos, currentPos+10, 1100, 1900);
    if(steering>1600){
     steering = 1900;
@@ -100,25 +103,15 @@ while(true){
    }
    rightServo(steering);
     motorR(reversingSpeed); 
-    b=ultrasonicValue(backSensor);
     if(b<18){
       motorS();
         delay(500);
          maxRightServo();
-         f=ultrasonicValue(frontSensor);
-           r=ultrasonicValue(rightSensorB);
-           rfs=ultrasonicValue(rightSensorF);
          while(rfs-r>1 && f>10){
           motorF(forwardSpeed);
-           r=ultrasonicValue(rightSensorB);
-           rfs=ultrasonicValue(rightSensorF);
-           f=ultrasonicValue(frontSensor);
          }
-          b=ultrasonicValue(backSensor);
          while(f>15 && b <15){
           centerServo();
-          b=ultrasonicValue(backSensor);
-          f=ultrasonicValue(frontSensor);
          }
          motorS();
           parked = true;

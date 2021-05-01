@@ -3,18 +3,20 @@ void bluetooth() {
     switch (SerialBT.read()) {
       case 'C': {
           boolean inControlCar = true;
+          //set all the bits to high
+          vTaskResume( ultrasonicTaskHandle );
+          xEventGroupSetBits(xEventGroup, allSensorBits);
           while (inControlCar) {
-            uint8_t a[8] = { highByte(ultrasonicValue(frontSensor)), lowByte(ultrasonicValue(frontSensor)),
-                             highByte(ultrasonicValue(backSensor)), lowByte(ultrasonicValue(backSensor)),
-                             highByte(ultrasonicValue(rightSensorF)), lowByte(ultrasonicValue(rightSensorF)),
-                             highByte(ultrasonicValue(rightSensorF)), lowByte(ultrasonicValue(rightSensorF))
-                           };
+            // send sensors value to the app using bluetooth
+            uint8_t a[9] = {highByte(f), lowByte(f), highByte(b), lowByte(b), highByte(rfs), lowByte(rfs), highByte(r), lowByte(r), 'x'};
+            SerialBT.write(a, 9);
 
-            SerialBT.write(a, 8);
-
+            //Listen for button press
             if (SerialBT.available()) {
               switch (SerialBT.read()) {
-                case 'L':         // turn left
+
+                // turn left
+                case 'L':
                   BTSteering = BTSteering + 100;
                   if (BTSteering >= 1900) {
                     BTSteering = 1900;
@@ -22,7 +24,9 @@ void bluetooth() {
                   rightServo(BTSteering);
                   Serial.println(BTSteering);
                   break;
-                case 'R':         // Turn Right
+
+                //Turn Right
+                case 'R':
                   BTSteering = BTSteering - 100;
                   if (BTSteering <= 1100) {
                     BTSteering = 1100;
@@ -30,26 +34,42 @@ void bluetooth() {
                   rightServo(BTSteering);
                   Serial.println(BTSteering);
                   break;
-                case 'F':         // go forward or increase the speed
+
+                //go forward or increase the speed
+                case 'F':
                   Serial.println("forward");
                   break;
-                case 'B':         //  reverse or increase the speed
+
+                //Reverse or increase the speed
+                case 'B':
                   Serial.println("reverse");
                   break;
-                case 'S':         // Stop motor
+
+                // Stop motor
+                case 'S':
                   Serial.println("stop");
                   //vTaskResume(wifiTaskHandle);
                   break;
-                case 'P':         // go forward or increase the speed
+
+                // Activate parking assist
+                case 'P':
                   Serial.println("parking assist");
+                  xEventGroupClearBits(xEventGroup, allSensorBits);
                   parkingAssist();
                   break;
-                case 'W':         // go forward or increase the speed
+
+                // go forward or increase the speed
+                case 'W':
                   Serial.println("Wifi");
                   //parkingAssist();
                   break;
-                case 'E':         // go forward or increase the speed
+
+                // go forward or increase the speed
+                case 'E':
+                  xEventGroupClearBits(xEventGroup, allSensorBits);
+                  vTaskSuspend(ultrasonicTaskHandle);
                   inControlCar = false;
+                  Serial.println("left in control car");
                   break;
               }
             }
@@ -62,8 +82,8 @@ void bluetooth() {
           break;
         }
       case 'O': {
-        wifiName ="";
-        wifiPass ="";
+          wifiName = "";
+          wifiPass = "";
           byte b;
           while (true) {
             b = SerialBT.read();
@@ -87,6 +107,7 @@ void bluetooth() {
           if (WiFi.status() == WL_CONNECTED) {
             writeToEEPROM(wifiName.c_str(), 0);
             writeToEEPROM(wifiPass.c_str(), 40);
+            Serial.println("WIFI was Saved");
           }
           break;
         }

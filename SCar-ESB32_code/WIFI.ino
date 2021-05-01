@@ -21,7 +21,8 @@ void ConnectToWiFi(const char *wifiName, const char *wifiPass)
   WiFi.disconnect();
   WiFi.mode(WIFI_STA);
   WiFi.begin(wifiName, wifiPass);
-  Serial.print("Connecting to "); Serial.println(wifiName);
+  Serial.print("Connecting to "); 
+  Serial.print(wifiName);
  
   uint8_t i = 0;
   while (WiFi.status() != WL_CONNECTED)
@@ -35,6 +36,10 @@ void ConnectToWiFi(const char *wifiName, const char *wifiPass)
       Serial.println("Faild To Connect");
       break;
     }
+  }
+  if(WiFi.status() == WL_CONNECTED){
+    Serial.print("\nConnected to ");
+    Serial.println(wifiName);
   }
 }
 
