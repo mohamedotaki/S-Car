@@ -11,8 +11,8 @@
         android:id="@+id/frontSensorTextViewControlCar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Front Sensor"
-        android:textSize="20dp"
+        android:text="@string/front_sensor"
+        android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/topArrow"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Back Sensor"
-        android:textSize="20dp"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -121,6 +121,19 @@
         app:layout_constraintBottom_toTopOf="@+id/leftSensorTextViewControlCar"
         app:layout_constraintEnd_toStartOf="@+id/topArrow"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/autoPilotButton"
+        android:layout_width="67dp"
+        android:layout_height="64dp"
+        android:background="@color/main"
+        android:padding="0dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/auto_pilot"
+        app:layout_constraintBottom_toTopOf="@+id/rightSensorTextViewControlCar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/topArrow"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

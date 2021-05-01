@@ -66,7 +66,7 @@ public class SettingsActivity extends AppCompatActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     try {
-                        bluetoothSocket = HomeActivity.connectToDevice(bluetoothDevicesArrayList.get(position));
+                         bluetoothSocket = HomeActivity.connectToDevice(bluetoothDevicesArrayList.get(position));
                         if (bluetoothSocket.isConnected()) {
                            SharedPreferences sharedPref = getSharedPreferences("settings", MODE_PRIVATE);
                            sharedPref.edit().putString("bluetoothDeviceName", bluetoothDevicesArrayList.get(position).getName()).apply();
