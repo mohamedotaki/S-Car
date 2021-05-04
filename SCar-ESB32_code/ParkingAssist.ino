@@ -1,130 +1,98 @@
-int  steering=1500 ,currentPos=0, emptySpace=0;
+int  steering = 1500 , currentPos = 0, emptySpace = 0;
 
 
-void parkingAssist(){
+void parkingAssist() {
   vTaskResume(ultrasonicTaskHandle);
-    searchForEmptySpace();
-    //fixPosition();
-    park();
+  searchForEmptySpace();
+  //fixPosition();
+  //park();
   vTaskSuspend(ultrasonicTaskHandle);
 }
 
-void searchForEmptySpace(){
-  int safeDis=0;
+void searchForEmptySpace() {
+  int safeDis = 0 , distanceTravelled = 0;
+  timeout = 10000;
   boolean readyToPark = false;
   centerServo();
-         xEventGroupSetBits(xEventGroup, frontSensorBit | rightSensorBit | leftSensorBit);
-      safeDis=0;
-      motorF(forwardSpeed);
-      int back=b , front = f;
-      while(f >20){
- 
-    while(r>carWidth && rfs > carWidth && f >20){
-
-      Serial.println("Clauclating empty space");
-      if(r>carWidth && rfs > carWidth) {
-        safeDis =+ 24; // 24cm as the sensors can detect 24cm of the car length
-        if(safeDis > 50){
-        readyToPark =true;
-        Serial.println("ready to park");
-        }
-      } 
-      else {
-        safeDis=0;
-        }
-        delay(100);         
-  if(readyToPark)break;
-
-      }
-       if(readyToPark)break;
-}
- 
- 
- motorS();     
-                   xEventGroupClearBits(xEventGroup, allSensorBits);
-}
-//void fixPosition(){
-//     r=ultrasonicValue(rightSensorB);
-//     rfs=ultrasonicValue(rightSensorF);
-//     currentPos=rfs;
-//   while((rfs-r)>0){
-//       Serial.print(r);
-//       Serial.print("---");
-//       Serial.println(l); 
-//     b=ultrasonicValue(backSensor);
-//    while(b>10 && (l-r)>0){
-//    r=ultrasonicValue(rightSensorB);
-//    l=ultrasonicValue(rightSensorF);
-//    b=ultrasonicValue(backSensor); 
-//    maxLeftServo();
-//    motorR(map(l,currentPos, currentPos - (l-r)-3, reversingSpeed, 1360));
-//    }
-//    Serial.println("Done");
-//        r=ultrasonicValue(rightSensorB);
-//    l=ultrasonicValue(rightSensorF);
-//    Serial.println(l-r);
-//    motorS();
-//    centerServo();
-//   }
-////    while(r>6){
-////      motorF(forwardSpeed);
-////   r=ultrasonicValue(rightSensorB);
-////   steering = map(r, (80/currentPos)+1, currentPos, 1850, 1100);
-////        Serial.print(r);
-////             Serial.print("--");
-////   Serial.println(steering);
-////   if(r<=10){
-////    steering = steering+50;
-////   }
-////rightServo(steering);
-////
-////
-////    }
-////    centerServo();
-////    motorS();
-////    currentPos=0;
-////}
-//}
-
-void park(){
-  delay(1000);
-  motorS(); 
-    xEventGroupSetBits(xEventGroup, allSensorBits);
- int currentPos=0,steering=0;
- boolean parked=false;
-      currentPos = rfs;
-while(true){          
-   steering = map(rfs, currentPos, currentPos+10, 1100, 1900);
-   if(steering>1600){
-    steering = 1900;
-   }
-   if(steering<1350){
-    steering = 1100;
-   }
-   rightServo(steering);
-    motorR(reversingSpeed); 
-    if(b<18){
-      motorS();
-        delay(500);
-         maxRightServo();
-         while(rfs-r>1 && f>10){
-          motorF(forwardSpeed);
-         }
-         while(f>15 && b <15){
-          centerServo();
-         }
-         motorS();
-          parked = true;
-         centerServo();
-       }
-         if (parked== true)break;
-      } 
-        
-
-}
-
-
-
-
+  xEventGroupSetBits(xEventGroup, frontSensorBit | rightSensorBit );
+  delay(50);
+  distanceTravelled = f;
+  Serial.println(distanceTravelled);
+  motorF(forwardSpeed);
 
   
+  myTime = millis();
+  while (true) {
+    // break from the while loop after 10 seconds if the car can't find empty spice 
+    unsigned long currentMillis = millis();
+    if(currentMillis - myTime > timeout) {
+      // nofity user no empty space was found, please try to start the parking assist beside an empty space
+      break; 
+    }
+    fixPosition();
+    if (rfs > carWidth) {
+      safeDis = + 24; // 24cm as the sensors can detect 24cm of the car length
+      if ((distanceTravelled - f) >=  50) {
+        readyToPark = true;
+        Serial.println("ready to park");
+      }
+    }
+    else {
+      distanceTravelled = f;
+      safeDis = 0;
+    }
+    if (readyToPark)break;
+
+  }
+  motorS();
+  xEventGroupClearBits(xEventGroup, allSensorBits);
+}
+
+void park() {
+  delay(1000);
+  motorS();
+  xEventGroupSetBits(xEventGroup, allSensorBits);
+  int currentPos = 0, steering = 0;
+  boolean parked = false;
+  currentPos = rfs;
+  while (true) {
+    steering = map(rfs, currentPos, currentPos + 10, 1100, 1900);
+    if (steering > 1600) {
+      steering = 1900;
+    }
+    if (steering < 1350) {
+      steering = 1100;
+    }
+    rightServo(steering);
+    motorR(reversingSpeed);
+    if (b < 18) {
+      motorS();
+      delay(500);
+      maxRightServo();
+      while (rfs - r > 1 && f > 10) {
+        motorF(forwardSpeed);
+      }
+      while (f > 15 && b < 15) {
+        centerServo();
+      }
+      motorS();
+      parked = true;
+      centerServo();
+    }
+    if (parked == true)break;
+  }
+}
+
+void fixPosition(){
+int newSensorValue=0;
+// if statement to add 30cm to current sensor value to fix the steering
+if(rfs <10){
+   newSensorValue =rfs + 30;
+}else{
+  newSensorValue = rfs;
+}
+
+ steering = map(newSensorValue, rightSideDistance-10, rightSideDistance + 10, 1900, 1100);
+ rightServo(steering);
+
+}

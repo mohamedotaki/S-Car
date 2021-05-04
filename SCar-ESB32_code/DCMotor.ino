@@ -15,14 +15,14 @@ void motorR(int speedRequiered){
 
 void motorS(){
       ledcWrite(escChan,1400);
-      delay(100);
+      delay(500);
     ledcWrite(escChan,1489);
       delay(100);
 }
 
    void motorEmergncyStop(){
     ledcWrite(escChan,1300);
-    delay(10);
+    delay(200);
     ledcWrite(escChan,1495);
       delay(10);
 }

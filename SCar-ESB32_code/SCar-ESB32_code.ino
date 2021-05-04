@@ -14,7 +14,7 @@
 
 BluetoothSerial SerialBT;
 static EventGroupHandle_t  xEventGroup;
-TaskHandle_t task1Handle = NULL, ultrasonicTaskHandle = NULL, powerManagementTaskHandle = NULL;
+TaskHandle_t task1Handle = NULL, ultrasonicTaskHandle = NULL, powerManagementTaskHandle = NULL ,statusUpdateHandle = NULL;
 
 //no changes
 // Servo
@@ -36,16 +36,21 @@ int BTSteering = 1500;
 int f, b, rfs, r;
 
 //Car Settings
-int reversingSpeed = 1353, forwardSpeed = 1592;
+const int reversingSpeed = 1353, forwardSpeed = 1588;
 int beforParkingPos = 0;
-int carWidth = 35; // car width is 26cm and 10cm for safty
-int  carLength = 50; // car length is 41cm and 9cm for safty
+const int carWidth = 35; // car width is 26cm and 9cm for safty
+const int  carLength = 50; // car length is 41cm and 9cm for safty
+const int rightSideDistance = 40;
 
 //wifi
 String wifiName, wifiPass;
 
 //Power
 int timeToSleep=0;
+
+// timing
+unsigned long myTime = 0;
+unsigned long timeout = 0;
 
 void mainTask( void *pvParameters );
 //void powerManagementTask( void *pvParameters );
@@ -78,6 +83,7 @@ void setup() {
   xEventGroup  =  xEventGroupCreate();
   xTaskCreatePinnedToCore(mainTask, "mainTask", 3000, NULL, 3, &task1Handle, 0);
   xTaskCreatePinnedToCore(ultrasonicTask, "ultrasonicTask", 3000, NULL, 5, &ultrasonicTaskHandle, 1);
+  //xTaskCreatePinnedToCore(statusUpdate, "statusUpdate", 2000, NULL, 3, &statusUpdateHandle, 1);
   //xTaskCreatePinnedToCore(powerManagementTask, "powerManagementTask", 200, NULL, 3, &powerManagementTaskHandle, 1);
   //vTaskSuspend(ultrasonicTaskHandle);
   //vTaskSuspend(task1Handle);
@@ -112,6 +118,21 @@ void loop() {
 
 
 }
+
+
+//void statusUpdate(void *pvParameters)
+//{
+//  for (;;)
+//  {
+//
+//
+//    vTaskDelay(10);
+//  }
+//}
+
+
+
+
 void ultrasonicTask(void *pvParameters)
 {
 
@@ -121,24 +142,34 @@ void ultrasonicTask(void *pvParameters)
     xEventGroupValue  = xEventGroupWaitBits(xEventGroup, allSensorBits , pdFALSE, pdFALSE, portMAX_DELAY );
     if ((xEventGroupValue & frontSensorBit) != 0) {
       f = ultrasonicValue(frontSensor);
-      Serial.print("Front :");
-      Serial.println(f);
+      if(f < 5){
+        motorEmergncyStop();
+      }
+//      Serial.print("Front :");
+//      Serial.println(f);
     }
     if ((xEventGroupValue & backSensorBit) != 0) {
       b = ultrasonicValue(backSensor);
-      Serial.print("Back: ");
-      Serial.println(b);
+//      Serial.print("Back: ");
+//      Serial.println(b);
+    }
+        if ((xEventGroupValue & rightSensorBit) != 0) {
+      r = ultrasonicValue(rightSensorB);
+//      Serial.print("Right Bottom: ");
+//      Serial.println(r);
+      if(r < 20){
+        Serial.print("++++++++++++++++++++++++++++++++++");
+      }
     }
     if ((xEventGroupValue & leftSensorBit) != 0) {
       rfs = ultrasonicValue(rightSensorF);
-      Serial.print("Right Top: ");
-      Serial.println(rfs);
+//      Serial.print("Right Top: ");
+//      Serial.println(rfs);
+      if(rfs < 20){
+        Serial.print("----------------------------------- ");
+      }
     }
-    if ((xEventGroupValue & rightSensorBit) != 0) {
-      r = ultrasonicValue(rightSensorB);
-      Serial.print("Right Bottom: ");
-      Serial.println(r);
-    }
+
 
     vTaskDelay(10);
 
@@ -161,7 +192,7 @@ void mainTask(void *pvParameters)
   {
     bluetooth();
 
-   //xEventGroupSetBits(xEventGroup, frontSensorBit | rightSensorBit | leftSensorBit | backSensorBit);
+  // xEventGroupSetBits(xEventGroup, frontSensorBit | rightSensorBit | leftSensorBit | backSensorBit);
 
 
 

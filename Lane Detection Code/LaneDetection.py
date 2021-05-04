@@ -5,14 +5,12 @@ import time
 import matplotlib.pyplot as plt
 
 
-
-
 def make_coordinates(line_parameter):
-   # try:
+    # try:
     slope, intercept = line_parameter
     # except TypeError:
     #     slope, intercept = 0.1, 0.1
-        ##print("it happend ")
+    ##print("it happend ")
     y1 = 650
     y2 = 500
     x1 = int((y1 - intercept) / slope)
@@ -63,7 +61,7 @@ def getSteeringAngle(averagedLines):
     leftX1, leftY1, leftX2, leftY2 = averagedLines[0]
     rightX1, rightY1, rightX2, rightY2 = averagedLines[1]
     temp = rightX2 - leftX2
-    centerTop = (temp /2) + leftX2
+    centerTop = (temp / 2) + leftX2
     temp2 = rightX1 - leftX1
     centerBottom = (temp2 / 2) + leftX1
 
@@ -101,24 +99,9 @@ def displayLines(image, lines, steering):
             intercept = parameters[1]
 
             cv2.line(line_image, (x1, y1), (x2, y2), (0, 255, 0), 8)
-        cv2.line(line_image, (int(steering[1])-30, y1), (int(steering[0]), y2), (0, 0, 255), 8)
+        cv2.line(line_image, (int(steering[1]) - 30, y1), (int(steering[0]), y2), (0, 0, 255), 8)
 
         return line_image
-
-
-# img = cv2.imread("test8.jpg")
-# canny = canny(img)
-# croppedImage = region_of_interest(canny)
-# lines = cv2.HoughLinesP(croppedImage, 4, np.pi / 180, 50, np.array([]), minLineLength=10,
-#                         maxLineGap=10)  # 2.180.100.40.5
-# average_lines = average_slope_intercept(img, lines)
-# line_image = displayLines(img, average_lines)
-# line_image2 = displayLines(img, lines)
-# comboImage = cv2.addWeighted(img, 0.3, line_image, 1, 1)
-# comboImage2 = cv2.addWeighted(img, 0.3, line_image2, 1, 1)
-# cv2.imshow("before", comboImage2)
-# cv2.imshow("after", comboImage)
-# cv2.waitKey(0)
 
 
 cap = cv2.VideoCapture("videoTest2.mp4")
@@ -134,9 +117,9 @@ while cap.isOpened():
     if (lines is not None):
         comboImage = cv2.addWeighted(frame, 0.5, line_image, 1, 1)
     cv2.imshow("after", comboImage)
-    #cv2.imshow("sss", croppedImage)
+    # cv2.imshow("sss", croppedImage)
 
-    #time.sleep(0.1)
+    # time.sleep(0.1)
     cv2.waitKey(1)
     ### to get size
     # plt.imshow(frame)

@@ -15,9 +15,9 @@
   // whose duration is the time (in microseconds) from the sending of the ping
   // to the reception of its echo off of an object.
   pinMode(PinNumber, INPUT);
-  duration = pulseIn(PinNumber, HIGH,4500);
+  duration = pulseIn(PinNumber, HIGH,5500);
   if(duration == 0){
-    cm = 70;
+    cm = 85;
   }else{
      cm = duration / 29 / 2;
   }
