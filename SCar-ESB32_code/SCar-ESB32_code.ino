@@ -2,8 +2,11 @@
 #define rightSensorBit (1<<1)
 #define leftSensorBit (1<<2)
 #define backSensorBit (1<<3)
+#define sendSensorsValueBit (1<<4)
 #define allSensorBits (frontSensorBit | rightSensorBit | leftSensorBit | backSensorBit)
 #include <WiFi.h>
+#include <HTTPClient.h>
+#include <Arduino_JSON.h>
 #include "EEPROM.h"
 #include "BluetoothSerial.h"
 #include <FreeRTOS.h>
@@ -14,7 +17,7 @@
 
 BluetoothSerial SerialBT;
 static EventGroupHandle_t  xEventGroup;
-TaskHandle_t task1Handle = NULL, ultrasonicTaskHandle = NULL, powerManagementTaskHandle = NULL ,statusUpdateHandle = NULL;
+TaskHandle_t task1Handle = NULL, ultrasonicTaskHandle = NULL, powerManagementTaskHandle = NULL , statusUpdateHandle = NULL;
 
 //no changes
 // Servo
@@ -46,7 +49,7 @@ const int rightSideDistance = 40;
 String wifiName, wifiPass;
 
 //Power
-int timeToSleep=0;
+int timeToSleep = 0;
 
 // timing
 unsigned long myTime = 0;
@@ -82,29 +85,19 @@ void setup() {
   // Tasks
   xEventGroup  =  xEventGroupCreate();
   xTaskCreatePinnedToCore(mainTask, "mainTask", 3000, NULL, 3, &task1Handle, 0);
-  xTaskCreatePinnedToCore(ultrasonicTask, "ultrasonicTask", 3000, NULL, 5, &ultrasonicTaskHandle, 1);
+  xTaskCreatePinnedToCore(ultrasonicTask, "ultrasonicTask", 3000, NULL, 4, &ultrasonicTaskHandle, 0);
   //xTaskCreatePinnedToCore(statusUpdate, "statusUpdate", 2000, NULL, 3, &statusUpdateHandle, 1);
   //xTaskCreatePinnedToCore(powerManagementTask, "powerManagementTask", 200, NULL, 3, &powerManagementTaskHandle, 1);
   //vTaskSuspend(ultrasonicTaskHandle);
   //vTaskSuspend(task1Handle);
-  /////////////////////////////////////////////////////////
-//  pinMode(26, INPUT);
-//  pinMode(25, INPUT);
 
 
- // WIFI
-  wifiName = readFromEEPROM(0);
-  wifiPass = readFromEEPROM(40);
-  if (wifiName.length() > 1 && wifiPass.length() > 1) {
-    ConnectToWiFi(wifiName.c_str(), wifiPass.c_str());
-  }
+connectToSavedWifi();
 
 
 }
 
 void loop() {
-
-  //////motorF(1700);
   //Serial.print(pulseIn(26,LOW));
   //Serial.print("--");
   //Serial.print(pulseIn(26,HIGH));
@@ -112,11 +105,6 @@ void loop() {
   //Serial.print(pulseIn(25,LOW));
   //Serial.print("--");
   //Serial.println(pulseIn(25,HIGH));
-//xEventGroupSetBits(xEventGroup, frontSensorBit);
-
-//delay(500);
-
-
 }
 
 
@@ -135,44 +123,29 @@ void loop() {
 
 void ultrasonicTask(void *pvParameters)
 {
-
   EventBits_t xEventGroupValue;
   for (;;)
   {
     xEventGroupValue  = xEventGroupWaitBits(xEventGroup, allSensorBits , pdFALSE, pdFALSE, portMAX_DELAY );
     if ((xEventGroupValue & frontSensorBit) != 0) {
       f = ultrasonicValue(frontSensor);
-      if(f < 5){
+      if (f < 5) {
         motorEmergncyStop();
       }
-//      Serial.print("Front :");
-//      Serial.println(f);
     }
     if ((xEventGroupValue & backSensorBit) != 0) {
       b = ultrasonicValue(backSensor);
-//      Serial.print("Back: ");
-//      Serial.println(b);
-    }
-        if ((xEventGroupValue & rightSensorBit) != 0) {
-      r = ultrasonicValue(rightSensorB);
-//      Serial.print("Right Bottom: ");
-//      Serial.println(r);
-      if(r < 20){
-        Serial.print("++++++++++++++++++++++++++++++++++");
-      }
     }
     if ((xEventGroupValue & leftSensorBit) != 0) {
-      rfs = ultrasonicValue(rightSensorF);
-//      Serial.print("Right Top: ");
-//      Serial.println(rfs);
-      if(rfs < 20){
-        Serial.print("----------------------------------- ");
-      }
+      r = ultrasonicValue(rightSensorB);
     }
-
-
+    if ((xEventGroupValue & rightSensorBit) != 0) {
+      rfs = ultrasonicValue(rightSensorF);
+    }
+    if ((xEventGroupValue & sendSensorsValueBit) != 0) {
+      sendSensorsValue();
+    }
     vTaskDelay(10);
-
   }
 }
 
@@ -191,25 +164,7 @@ void mainTask(void *pvParameters)
   for (;;)
   {
     bluetooth();
-
-  // xEventGroupSetBits(xEventGroup, frontSensorBit | rightSensorBit | leftSensorBit | backSensorBit);
-
-
-
-
-    // motorF(1650);
-    //motorF(1580);
-    //f=ultrasonicValue(frontSensor);
-    // r=ultrasonicValue(rightSensor);
-    // b=ultrasonicValue(backSensor);
-    //Serial.print(r);
-    //Serial.print("---");
-    //Serial.println(b);
-
-    //searchForEmptySpace(r);
-    // park();
+    
     vTaskDelay(10);  // one tick delay (15ms) in between reads for stability
-
-
   }
 }

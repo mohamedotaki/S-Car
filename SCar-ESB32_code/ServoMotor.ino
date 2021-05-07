@@ -1,6 +1,5 @@
 // servo values 1100 to 1900
 
-
 void centerServo(){
   ledcWrite(servoChan,1500);
 delay(10);
@@ -16,9 +15,9 @@ void maxRightServo(){
 delay(10);
 }
 
-void rightServo(int ang){
-if(ang>=1100 && ang <= 1900){
-   ledcWrite(servoChan,ang);
+void writeServo(int steeringValue){
+if(steeringValue>=1100 && steeringValue <= 1900){
+   ledcWrite(servoChan,steeringValue);
 }
 delay(10);
 

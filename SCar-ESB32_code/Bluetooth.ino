@@ -1,121 +1,79 @@
 void bluetooth() {
   if (SerialBT.available()) {
     switch (SerialBT.read()) {
+      // user is in control car activity start sending sensors value to the app
       case 'C': {
-          boolean inControlCar = true;
           //set all the bits to high
           vTaskResume( ultrasonicTaskHandle );
-          xEventGroupSetBits(xEventGroup, allSensorBits);
-          while (inControlCar) {
-            // send sensors value to the app using bluetooth
-            uint8_t a[9] = {highByte(f), lowByte(f), highByte(b), lowByte(b), highByte(rfs), lowByte(rfs), highByte(r), lowByte(r), 'x'};
-            SerialBT.write(a, 9);
-
-            //Listen for button press
-            if (SerialBT.available()) {
-              switch (SerialBT.read()) {
-
-                // turn left
-                case 'L':
-                  BTSteering = BTSteering + 100;
-                  if (BTSteering >= 1900) {
-                    BTSteering = 1900;
-                  }
-                  rightServo(BTSteering);
-                  Serial.println(BTSteering);
-                  break;
-
-                //Turn Right
-                case 'R':
-                  BTSteering = BTSteering - 100;
-                  if (BTSteering <= 1100) {
-                    BTSteering = 1100;
-                  }
-                  rightServo(BTSteering);
-                  Serial.println(BTSteering);
-                  break;
-
-                //go forward or increase the speed
-                case 'F':
-                  Serial.println("forward");
-                  break;
-
-                //Reverse or increase the speed
-                case 'B':
-                  Serial.println("reverse");
-                  break;
-
-                // Stop motor
-                case 'S':
-                  Serial.println("stop");
-                  //vTaskResume(wifiTaskHandle);
-                  break;
-
-                // Activate parking assist
-                case 'P':
-                  Serial.println("parking assist");
-                  xEventGroupClearBits(xEventGroup, allSensorBits);
-                  parkingAssist();
-                  break;
-
-                // go forward or increase the speed
-                case 'W':
-                  Serial.println("Wifi");
-                  //parkingAssist();
-                  break;
-
-                // go forward or increase the speed
-                case 'E':
-                  xEventGroupClearBits(xEventGroup, allSensorBits);
-                  vTaskSuspend(ultrasonicTaskHandle);
-                  inControlCar = false;
-                  Serial.println("left in control car");
-                  break;
-              }
-            }
-          }
-          break;
+          xEventGroupSetBits(xEventGroup, allSensorBits | sendSensorsValueBit);
         }
+      // turn left received from user
+      case 'L':
+        BTSteering = BTSteering + 100;
+        if (BTSteering >= 1900) {
+          BTSteering = 1900;
+        }
+        writeServo(BTSteering);
+        break;
 
-      case 'W': {
+      //Turn right received from user
+      case 'R':
+        BTSteering = BTSteering - 100;
+        if (BTSteering <= 1100) {
+          BTSteering = 1100;
+        }
+        writeServo(BTSteering);
+        break;
+
+      //go forward or increase the speed
+      case 'F':
+        Serial.println("forward");
+        break;
+
+      //Reverse or increase the speed
+      case 'B':
+        Serial.println("reverse");
+        break;
+
+      // Stop motor
+      case 'S':
+        Serial.println("stop");
+        //vTaskResume(wifiTaskHandle);
+        break;
+
+      // Activate parking assist
+      case 'P':
+        xEventGroupClearBits(xEventGroup, allSensorBits);
+        parkingAssist();
+        break;
+
+      // go forward or increase the speed
+      case 'j':
+        Serial.println("Wifi");
+        //parkingAssist();
+        break;
+
+      // Stpe sending sensors value to to app and suspend the ultrasonic task
+      case 'E':
+        xEventGroupClearBits(xEventGroup, allSensorBits | sendSensorsValueBit);
+        vTaskSuspend(ultrasonicTaskHandle);
+        break;
+
+      case 'W':
+          // scan the available wifi and send to the app
           scanNetworks();
           break;
-        }
-      case 'O': {
-          wifiName = "";
-          wifiPass = "";
-          byte b;
-          while (true) {
-            b = SerialBT.read();
-            if (b != 3) {
-              wifiName += (char) b;
-            }
-            else {
-              while (true) {
-                b = SerialBT.read();
-                if (b != 4) {
-                  wifiPass += (char) b;
-                }
-                else {
-                  break;
-                }
-              }
-              break;
-            }
-          }
-          ConnectToWiFi(wifiName.c_str(), wifiPass.c_str());
-          if (WiFi.status() == WL_CONNECTED) {
-            writeToEEPROM(wifiName.c_str(), 0);
-            writeToEEPROM(wifiPass.c_str(), 40);
-            Serial.println("WIFI was Saved");
-          }
+        
+      case 'O': 
+          // get user input from the app
+          getWifiDetailsFromApp();
           break;
-        }
-
-    }
+    } // end of BT read
   }
+} // end of BT function
 
-
-
-
+void sendSensorsValue() {
+  // send sensors value to the app using bluetooth
+  uint8_t a[9] = {highByte(f), lowByte(f), highByte(b), lowByte(b), highByte(rfs), lowByte(rfs), highByte(r), lowByte(r), 'x'};
+  SerialBT.write(a, 9);
 }
