@@ -1,6 +1,4 @@
-import com.example.s_car.Driver;
 import com.example.s_car.Event;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -11,10 +9,14 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Scanner;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 
-@WebServlet(urlPatterns = {"/GetEvents"})
-public class GetEvents extends HttpServlet {
+@WebServlet(urlPatterns = {"/GetEventsESP32"})
+public class GetEventsESP32 extends HttpServlet {
 
     /**
      * Processes requests for both HTTP
@@ -28,20 +30,24 @@ public class GetEvents extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("application/octet-stream");
-        System.out.println(request.getRequestURI());
-        System.out.println(request.getRemoteHost());
-        System.out.println(request.getPathInfo());
-        System.out.println(request.getQueryString());
-        System.out.println(request.getRequestURL().toString());
+        response.setContentType("application/json");
         InputStream in = request.getInputStream();
-        ObjectInputStream inputFromApp = new ObjectInputStream(in);
+        String data ="";
+        Scanner scanner = new Scanner(in);
+        while(scanner.hasNext()){
+            data += scanner.nextLine();
+        }
+        scanner.close();
         OutputStream outstr = response.getOutputStream();
+        PrintWriter printWriter = new PrintWriter(outstr);
         ObjectOutputStream oos = new ObjectOutputStream(outstr);
 
         try {
-            // response.setContentType("application/x-java-serialized-object");
-            int ownerId = (Integer) inputFromApp.readObject();
+            Object object = JSONValue.parse(data);
+            JSONObject jsonObject = (JSONObject) object;
+            int ownerId =Integer.parseInt((String) jsonObject.get("EventID")) ;
+            //System.out.println(ownerId);
+
             if(ownerId == 0) {
                 ownerId = 0;  // default to all
             }
@@ -51,14 +57,20 @@ public class GetEvents extends HttpServlet {
             PreparedStatement find = con.prepareStatement("select * from events where ownerId LIKE ?");
             find.setInt(1, ownerId);
             ResultSet rs = find.executeQuery();
+            JSONObject allData = new JSONObject();
+            JSONArray arr = new JSONArray();
             while(rs.next()) {
-                Event event = new Event(rs.getInt("eventId"), rs.getInt("ownerId"),rs.getString("title")
-                        ,rs.getString("eventDate"),rs.getString("eventTime"),rs.getString("address"),
-                        rs.getString("town"),rs.getString("county"));
-                oos.writeObject(event);
+                JSONObject obj=new JSONObject();
+                obj.put("Date",rs.getString("eventDate"));
+                obj.put("Time",rs.getString("eventTime"));
+                obj.put("Address",rs.getString("address"));
+                obj.put("Town",rs.getString("town"));
+                obj.put("County",rs.getString("county"));
+                arr.add(obj);
 
             }
-
+            allData.put("Data", arr);
+            oos.writeObject(allData.toJSONString());
             rs.close();
             find.close();
             con.close();
@@ -68,10 +80,7 @@ public class GetEvents extends HttpServlet {
             System.out.println(ex.toString());
         }
         finally{
-            Event last = new Event();
-            oos.writeObject(last);  // customer with a blank id indicates the last one
-            oos.flush();
-            oos.close();
+
 
         }
 

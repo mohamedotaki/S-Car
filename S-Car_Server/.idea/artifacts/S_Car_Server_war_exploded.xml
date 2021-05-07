@@ -13,6 +13,11 @@
         <element id="directory" name="classes">
           <element id="module-output" name="S-Car_Server" />
         </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: org.codehaus.jackson:jackson-core-asl:1.9.12" />
+          <element id="library" level="project" name="Maven: org.mortbay.jetty:jetty-util:6.1.25" />
+          <element id="library" level="project" name="Maven: com.googlecode.json-simple:json-simple:1.1" />
+        </element>
       </element>
       <element id="directory" name="META-INF">
         <element id="file-copy" path="$PROJECT_DIR$/target/S-Car_Server-1.0-SNAPSHOT/META-INF/MANIFEST.MF" />
