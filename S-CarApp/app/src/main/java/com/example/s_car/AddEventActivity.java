@@ -68,6 +68,7 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
         }
 
 
+        // buttons listeners
         repeatDailySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -99,9 +100,6 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
                             calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),calendar.get(Calendar.DAY_OF_MONTH));
                     datePickerDialog.show();
                 }
-
-
-
             }
         });
 
@@ -135,12 +133,11 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.deleteButton:
-                if(event.getId() != 0) {
-                    new deleteEvent().execute(event);
-                }
-                return true;
+        if (item.getItemId() == R.id.deleteButton) {
+            if (event.getId() != 0) {
+                new deleteEvent().execute(event);
+            }
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -197,7 +194,7 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
                 ObjectOutputStream os = null;
                 ObjectInputStream ois = null;
                 String line = null;
-                URL url = new URL("http://192.168.1.26:8080/S_Car_Server_war_exploded/" + "AddEvent");
+                URL url = new URL("http://192.168.1.3:8080/S_Car_Server_war_exploded/" + "AddEvent");
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setDoOutput(true);
                 con.setDoInput(true);
@@ -241,7 +238,7 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
                 ObjectOutputStream os = null;
                 ObjectInputStream ois = null;
                 String line = null;
-                URL url = new URL("http://192.168.1.26:8080/S_Car_Server_war_exploded/" + "DeleteEvent");
+                URL url = new URL("http://192.168.1.3:8080/S_Car_Server_war_exploded/" + "DeleteEvent");
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setDoOutput(true);
                 con.setDoInput(true);
@@ -267,6 +264,9 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
         @Override
         protected void onPostExecute(Boolean result) {
             if(result){
+                Toast.makeText(AddEventActivity.this, "Event Deleted", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent();
+                setResult(Activity.RESULT_OK,intent);
                 finish();
             }
         }

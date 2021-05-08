@@ -45,13 +45,13 @@ public class StartupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_startup);
 
-        password = (EditText) findViewById(R.id.passwordEditText);
-        email = (EditText) findViewById(R.id.emailEditText);
-        register = (Button) findViewById(R.id.registerButton);
-        login = (Button) findViewById(R.id.loginButton);
-        coverImage = (ImageView) findViewById(R.id.startupWhiteCover);
-        carImage = (ImageView) findViewById(R.id.startupImageView);
-        rememberLogin = (CheckBox) findViewById(R.id.rememberLogin);
+        password = findViewById(R.id.passwordEditText);
+        email = findViewById(R.id.emailEditText);
+        register = findViewById(R.id.registerButton);
+        login = findViewById(R.id.loginButton);
+        coverImage = findViewById(R.id.startupWhiteCover);
+        carImage = findViewById(R.id.startupImageView);
+        rememberLogin = findViewById(R.id.rememberLogin);
 
         Animation(coverImage);
 
@@ -149,7 +149,6 @@ public class StartupActivity extends AppCompatActivity {
             try {
                 ObjectOutputStream os = null;
                 ObjectInputStream ois = null;
-                String line = null;
                 URL url = new URL("http://192.168.1.3:8080/S_Car_Server_war_exploded/" + "Login");
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setDoOutput(true);

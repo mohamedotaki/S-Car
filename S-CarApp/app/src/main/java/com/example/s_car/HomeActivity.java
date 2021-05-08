@@ -40,14 +40,14 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        controlButton = (Button)findViewById(R.id.controlButton);
-        mapButton = (Button)findViewById(R.id.mapButtonHome);
-        calendarButton = (Button)findViewById(R.id.calendarButtonHomeActivity);
-        settingsButton = (Button)findViewById(R.id.settingsButton);
-        driversButton = (Button)findViewById(R.id.DriversButton);
-        accountType = (TextView)findViewById(R.id.accountTypeTextViewHome);
-        timeLeft = (TextView)findViewById(R.id.timeLeftTextViewHome);
-        userName = (TextView)findViewById(R.id.userNameTextViewHome);
+        controlButton = findViewById(R.id.controlButton);
+        mapButton = findViewById(R.id.mapButtonHome);
+        calendarButton = findViewById(R.id.calendarButtonHomeActivity);
+        settingsButton = findViewById(R.id.settingsButton);
+        driversButton = findViewById(R.id.DriversButton);
+        accountType = findViewById(R.id.accountTypeTextViewHome);
+        timeLeft = findViewById(R.id.timeLeftTextViewHome);
+        userName = findViewById(R.id.userNameTextViewHome);
 
         sharedPreferences = getSharedPreferences("settings", MODE_PRIVATE);
 
@@ -66,9 +66,6 @@ public class HomeActivity extends AppCompatActivity {
             accountType.setText("Owner");
             timeLeft.setVisibility(View.GONE);
         }
-
-         // database = Room.databaseBuilder(getApplicationContext(), Local_Database.class,"S_Car_Database").build();
-        //new GetData().execute();
 
         try {
             availableBluetooth();
@@ -106,7 +103,6 @@ public class HomeActivity extends AppCompatActivity {
                     goTo(CalendarActivity.class);
             }
         });
-
         controlButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -119,8 +115,6 @@ public class HomeActivity extends AppCompatActivity {
                 }
             }
         });
-
-
 
     }
 
@@ -135,12 +129,11 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.logoutButton:
-                sharedPreferences.edit().putBoolean("LoggedIn",false);
-                finish();
-                goTo(StartupActivity.class);
-                return true;
+        if (item.getItemId() == R.id.logoutButton) {
+            sharedPreferences.edit().putBoolean("LoggedIn", false);
+            finish();
+            goTo(StartupActivity.class);
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -189,11 +182,8 @@ public class HomeActivity extends AppCompatActivity {
 
 
     private void goTo(Class activity){
-        try {
             Intent intent = new Intent(getApplicationContext(),activity);
             startActivity(intent);
-        }catch (Exception e){}
-
     }
 
     private String calculateTimeLeft(String time){

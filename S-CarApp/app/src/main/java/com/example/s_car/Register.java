@@ -32,14 +32,15 @@ public class Register extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
         ///////////////////////////////Items
-        registerButton = (Button) findViewById(R.id.registerButtonRegister);
-        name = (EditText) findViewById(R.id.nameEditTextRegister);
-        password = (EditText) findViewById(R.id.passwordEditTextRegister);
-        conformPassword = (EditText) findViewById(R.id.conformPasswordEditTextRegister);
-        carNumber = (EditText) findViewById(R.id.carNumberEditTextRegister);
-        emailAddress = (EditText) findViewById(R.id.EmailAddressEditTextRegister);
-        phoneNumber = (EditText) findViewById(R.id.phoneNumberEditTextRegister);
+        registerButton = findViewById(R.id.registerButtonRegister);
+        name = findViewById(R.id.nameEditTextRegister);
+        password = findViewById(R.id.passwordEditTextRegister);
+        conformPassword = findViewById(R.id.conformPasswordEditTextRegister);
+        carNumber = findViewById(R.id.carNumberEditTextRegister);
+        emailAddress = findViewById(R.id.EmailAddressEditTextRegister);
+        phoneNumber = findViewById(R.id.phoneNumberEditTextRegister);
         addImageButton = findViewById(R.id.imageButtonRegister);
         imageListView = findViewById(R.id.imageListViewRegister);
 
@@ -92,8 +93,8 @@ public class Register extends AppCompatActivity {
         protected String doInBackground(User... users) {
             User user = users[0];
             try {
-                ObjectInputStream ois = null;
-                URL url = new URL("http://192.168.1.26:8080/S_Car_Server_war_exploded/" + "Register");
+                ObjectInputStream ois;
+                URL url = new URL("http://192.168.1.3:8080/S_Car_Server_war_exploded/" + "Register");
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setDoOutput(true);
                 con.setDoInput(true);

@@ -65,11 +65,10 @@ public class CalendarActivity extends AppCompatActivity implements Serializable 
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.addButtonMenu:
-                Intent intent = new Intent(getApplicationContext(),AddEventActivity.class);
-                startActivityForResult(intent,addEventActivity);
-                return true;
+        if (item.getItemId() == R.id.addButtonMenu) {
+            Intent intent = new Intent(getApplicationContext(), AddEventActivity.class);
+            startActivityForResult(intent, addEventActivity);
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -96,7 +95,7 @@ public class CalendarActivity extends AppCompatActivity implements Serializable 
                 ObjectOutputStream os = null;
                 ObjectInputStream ois = null;
                 String line = null;
-                URL url = new URL("http://192.168.1.26:8080/S_Car_Server_war_exploded/" + "GetEvents");
+                URL url = new URL("http://192.168.1.3:8080/S_Car_Server_war_exploded/" + "GetEvents");
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setDoOutput(true);
                 con.setDoInput(true);

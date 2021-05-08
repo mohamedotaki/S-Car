@@ -45,15 +45,15 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        wifiSwitch = (Switch) findViewById(R.id.wifiSwitch);
-        wifiConnectButton = (Button) findViewById(R.id.wifiConnectButton);
-        wifiListHeading = (TextView) findViewById(R.id.wifiListHeading);
-        wifiTextView = (TextView) findViewById(R.id.chosenWifi);
-        isConnectedBluetooth = (TextView) findViewById(R.id.isConnectedBluetoothTextView);
-        availableWifiList = (ListView) findViewById(R.id.availableWifiList);
-        wifiPasswordEditText = (EditText) findViewById(R.id.wifiPasswordEditText);
-        bluetoothListView = (ListView) findViewById(R.id.bluetoothListView);
-        bluetoothButton = (Button) findViewById(R.id.bluetoothButtonSettings);
+        wifiSwitch = findViewById(R.id.wifiSwitch);
+        wifiConnectButton = findViewById(R.id.wifiConnectButton);
+        wifiListHeading = findViewById(R.id.wifiListHeading);
+        wifiTextView = findViewById(R.id.chosenWifi);
+        isConnectedBluetooth = findViewById(R.id.isConnectedBluetoothTextView);
+        availableWifiList = findViewById(R.id.availableWifiList);
+        wifiPasswordEditText = findViewById(R.id.wifiPasswordEditText);
+        bluetoothListView = findViewById(R.id.bluetoothListView);
+        bluetoothButton = findViewById(R.id.bluetoothButtonSettings);
 
 
         /////////BlueTooth

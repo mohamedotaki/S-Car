@@ -84,6 +84,7 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
             }
         });
 
+        //buttons listener
         addImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -130,12 +131,6 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
             }
         });
 
-
-
-
-
-
-
         driverType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -174,6 +169,7 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
         }
 
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
@@ -184,12 +180,11 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
     }
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.deleteButton:
-                if(driver.getId() != 0 && driver.getLoginID() !=0) {
-                    new deleteDriver().execute(driver);
-                }
-                return true;
+        if (item.getItemId() == R.id.deleteButton) {
+            if (driver.getId() != 0 && driver.getLoginID() != 0) {
+                new deleteDriver().execute(driver);
+            }
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -277,7 +272,7 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
                 ObjectOutputStream os = null;
                 ObjectInputStream ois = null;
                 String line = null;
-                URL url = new URL("http://192.168.1.26:8080/S_Car_Server_war_exploded/" + "DeleteDrivers");
+                URL url = new URL("http://192.168.1.3:8080/S_Car_Server_war_exploded/" + "DeleteDrivers");
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setDoOutput(true);
                 con.setDoInput(true);
