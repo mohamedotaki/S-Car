@@ -40,7 +40,7 @@ public class DeleteDriver extends HttpServlet {
             Driver driver = (Driver) inputFromApp.readObject();
 
             Class.forName( "com.mysql.cj.jdbc.Driver" );
-            Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar","root","root" );
+            Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar?serverTimezone=UTC","root","root" );
 
             PreparedStatement deleteDriver = con.prepareStatement("delete from drivers  where driverId =?;");
             deleteDriver.setInt(1,driver.getId());

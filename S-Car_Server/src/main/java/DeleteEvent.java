@@ -40,7 +40,7 @@ public class DeleteEvent extends HttpServlet {
             Event event = (Event) inputFromApp.readObject();
 
             Class.forName( "com.mysql.cj.jdbc.Driver" );
-            Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar","root","root" );
+            Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar?serverTimezone=UTC","root","root" );
 
             PreparedStatement deleteEvent = con.prepareStatement("delete from events  where eventId =?;");
             deleteEvent.setInt(1,event.getId());

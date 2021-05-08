@@ -34,7 +34,7 @@ public class AddEvent extends HttpServlet {
         try {
             Event event = (Event) ois.readObject();
             Class.forName( "com.mysql.cj.jdbc.Driver" );
-            Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar","root","root" );
+            Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar?serverTimezone=UTC","root","root" );
             if(event != null && event.getId() == 0) {
                 PreparedStatement addToEvents = con.prepareStatement("Insert Into events  Values (null,?,?,?,?,?,?,?)");
                 addToEvents.setInt(1,event.getOwnerId());

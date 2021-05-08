@@ -41,7 +41,7 @@ public class AddDriver extends HttpServlet {
 
             if(driver != null && driver.getId() == 0) {
                 Class.forName( "com.mysql.cj.jdbc.Driver" );
-                Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar","root","root" );
+                Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar?serverTimezone=UTC","root","root" );
                 PreparedStatement addToLogin = con.prepareStatement("Insert Into login  Values (null,?,?,false)", Statement.RETURN_GENERATED_KEYS);
                 addToLogin.setString(1,driver.getEmailAddress());
                 addToLogin.setString(2,driver.getPassword());
@@ -73,7 +73,7 @@ public class AddDriver extends HttpServlet {
                 addToLogin.close();
                 con.close();
             }else if(driver != null && driver.getId() !=0){
-                Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar","root","root" );
+                Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar?serverTimezone=UTC","root","root" );
                 PreparedStatement updateLogin = con.prepareStatement("UPDATE login  set password=? where loginId =?");
                 updateLogin.setString(1,"tochange");
                 updateLogin.setInt(2,driver.getLoginID());

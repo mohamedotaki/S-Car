@@ -47,7 +47,7 @@ public class GetDrivers extends HttpServlet {
                 ownerId = 0;  // default to all
             }
             Class.forName( "com.mysql.cj.jdbc.Driver" );
-            Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar","root","root" );
+            Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar?serverTimezone=UTC","root","root" );
 
             PreparedStatement find = con.prepareStatement("select * from drivers , login where ownerId LIKE ? AND login.loginId LIKE drivers.loginId   ;");
             find.setInt(1, ownerId);

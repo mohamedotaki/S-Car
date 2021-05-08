@@ -27,7 +27,7 @@ public class Register extends HttpServlet {
              User user = (User) ois.readObject();
             if(user != null) {
                 Class.forName( "com.mysql.cj.jdbc.Driver" );
-                Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar","root","root" );
+                Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar?serverTimezone=UTC","root","root" );
                 PreparedStatement checkOwner = con.prepareStatement("SELECT count(*) FROM owners , login where carNumber like ? or email like ?");
                 checkOwner.setNString(1, user.getCarNumber());
                 checkOwner.setNString(2, user.getEmailAddress());
