@@ -1,3 +1,7 @@
 void setSettings(){
   
 }
+
+void checkDetails(){
+  
+}

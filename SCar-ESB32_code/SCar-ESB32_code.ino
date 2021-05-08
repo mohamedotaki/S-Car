@@ -55,6 +55,10 @@ int timeToSleep = 0;
 unsigned long myTime = 0;
 unsigned long timeout = 0;
 
+//BT 
+
+String BTDataInput="";
+
 void mainTask( void *pvParameters );
 //void powerManagementTask( void *pvParameters );
 //void wifiTask( void *pvParameters );
@@ -65,6 +69,7 @@ void setup() {
   Serial.begin(115200);
   //Bluetooth setup
   SerialBT.begin("S-Car");
+  SerialBT.register_callback(callback);
   Serial.println("Bluetooth is on..");
   //Servo
   pinMode(servo, OUTPUT);

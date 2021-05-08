@@ -77,3 +77,21 @@ void sendSensorsValue() {
   uint8_t a[9] = {highByte(f), lowByte(f), highByte(b), lowByte(b), highByte(rfs), lowByte(rfs), highByte(r), lowByte(r), 'x'};
   SerialBT.write(a, 9);
 }
+
+void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param){
+  if(event == ESP_SPP_SRV_OPEN_EVT){
+    Serial.println("Client Connected");
+    Serial.println(readBTInput());
+    
+  }
+}
+
+Sring readBTInput(){
+  BTDataInput="";
+  byte b;
+  while (b != 4) {
+  b = SerialBT.read();
+      BTDataInput += (char) b;
+  }
+  return BTDataInput;
+}
