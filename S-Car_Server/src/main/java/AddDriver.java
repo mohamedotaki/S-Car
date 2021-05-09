@@ -75,7 +75,7 @@ public class AddDriver extends HttpServlet {
             }else if(driver != null && driver.getId() !=0){
                 Connection  con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scar?serverTimezone=UTC","root","root" );
                 PreparedStatement updateLogin = con.prepareStatement("UPDATE login  set password=? where loginId =?");
-                updateLogin.setString(1,"tochange");
+                updateLogin.setString(1,driver.getPassword());
                 updateLogin.setInt(2,driver.getLoginID());
                 updateLogin.executeUpdate();
                 PreparedStatement updateDriver = con.prepareStatement("update drivers  set fullName=?,phoneNumber=?" +
