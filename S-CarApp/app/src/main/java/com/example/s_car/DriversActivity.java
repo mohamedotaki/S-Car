@@ -34,16 +34,22 @@ public class DriversActivity extends AppCompatActivity {
     ListView driversListView;
     DriversAdapter driversAdapter;
     int driversActivityRequestCode = 111;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drivers);
 
+        Intent intent = getIntent();
+        Bundle receivedData = intent.getExtras();
+        if(receivedData != null) {
+            user = (User) receivedData.getSerializable("currentUser");
+        }
         ////////////////////
         driversListView = (ListView) findViewById(R.id.driversListView);
 
-        new getDrivers().execute(StartupActivity.oo.id);
+        new getDrivers().execute(user.id);
 
         driversListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -52,9 +58,9 @@ public class DriversActivity extends AppCompatActivity {
                 Intent intent = new Intent(DriversActivity.this,AddDriversActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("Driver",driver);
+                bundle.putSerializable("currentUser",user);
                 intent.putExtras(bundle);
                 startActivityForResult(intent,driversActivityRequestCode);
-
             }
         });
 
@@ -74,7 +80,10 @@ public class DriversActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.addButtonMenu:
-                Intent intent = new Intent(DriversActivity.this,AddDriversActivity.class);
+                Intent intent = new Intent(getApplicationContext(),AddDriversActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("currentUser",user);
+                intent.putExtras(bundle);
                 startActivity(intent);
                 return true;
         }
@@ -86,7 +95,7 @@ public class DriversActivity extends AppCompatActivity {
 
         if (requestCode == driversActivityRequestCode) {
             if(resultCode == Activity.RESULT_OK){
-                new getDrivers().execute(StartupActivity.oo.id);
+                new getDrivers().execute(user.id);
             }
         }
     }//onActivityResult

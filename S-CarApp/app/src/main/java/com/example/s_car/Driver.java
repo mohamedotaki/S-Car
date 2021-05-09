@@ -13,6 +13,11 @@ public class Driver extends User implements Serializable {
         drivingPermission ="";
     }
 
+    public Driver(int id, int loginID, String name, String emailAddress, String phoneNumber, String carNumber, String password, String carKey, int imageId,  String drivingPermission) {
+        super(id, loginID, name, emailAddress, phoneNumber, carNumber, password, carKey, imageId);
+        this.drivingPermission = drivingPermission;
+    }
+
     public Driver(int id, int loginID, int ownerId, String name, String emailAddress, String phoneNumber, String carNumber, String password, String carKey, int imageId,  String drivingPermission) {
         super(id, loginID, name, emailAddress, phoneNumber, carNumber, password, carKey, imageId);
         this.ownerId = ownerId;

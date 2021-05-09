@@ -35,6 +35,7 @@ import java.util.Date;
 public class AddEventActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener,TimePickerDialog.OnTimeSetListener{
 
     EditText eventTitle,address1,town,county;
+    private User user;
     TextView date;
     SwitchCompat repeatDailySwitch;
     boolean repeatDaily;
@@ -61,10 +62,15 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
         Intent intent = getIntent();
         Bundle receivedData = intent.getExtras();
         if(receivedData != null) {
-            event = (Event) receivedData.getSerializable("EventToEdit");
-            if (event.getId() != 0) {
-                setEventToEdit(event);
-            }
+            user = (User) receivedData.getSerializable("currentUser");
+            try {
+                event = (Event) receivedData.getSerializable("EventToEdit");
+                if (event.getId() != 0) {
+                    setEventToEdit(event);
+                }
+            }catch (Exception ignored){}
+        }else {
+            finish();
         }
 
 
@@ -107,7 +113,7 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
             @Override
             public void onClick(View v) {
                 try {
-                    event.setOwnerId(StartupActivity.oo.getId());
+                    event.setOwnerId(user.getId());
                     event.setTitle(Encryption.encrypt(eventTitle.getText().toString()));
                     event.setAddress1(Encryption.encrypt(address1.getText().toString()));
                     event.setTown(Encryption.encrypt(town.getText().toString()));

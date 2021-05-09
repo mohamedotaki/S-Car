@@ -22,7 +22,8 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:replace="android:allowBackup">
-        <activity android:name=".MapActivity"></activity>
+        <activity android:name=".StatusActivity"></activity>
+        <activity android:name=".MapActivity" />
         <activity android:name=".AddEventActivity" />
         <activity android:name=".CalendarActivity" />
         <activity android:name=".AddDriversActivity" />

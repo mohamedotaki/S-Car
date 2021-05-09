@@ -4,13 +4,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/list">
+    android:background="@color/main">
 
     <TextView
         android:id="@+id/dateTextViewDateHeader"
         android:layout_width="match_parent"
         android:layout_height="20dp"
-        android:background="@color/list"
         android:text="  20/01/2021"
         android:textColor="@color/Black"
         android:textSize="15dp"

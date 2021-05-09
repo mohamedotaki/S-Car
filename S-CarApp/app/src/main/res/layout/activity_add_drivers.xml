@@ -37,6 +37,9 @@
         android:layout_width="300dp"
         android:layout_height="75dp"
         android:hint="Full Name"
+        android:inputType="textPersonName"
+        android:maxLength="30"
+        android:maxLines="1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
@@ -47,21 +50,34 @@
         android:layout_width="300dp"
         android:layout_height="75dp"
         android:hint="Email Address"
+        android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/nameEditTextAddDriver" />
+
+
     <EditText
-        android:id="@+id/phoneNumberEditTextAddDriver"
+        android:id="@+id/passwordEditTextAddDriver"
         android:layout_width="300dp"
         android:layout_height="75dp"
-        android:hint="Phone Number"
+        android:hint="Password"
+        android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/emailAddressEditTextAddDriver" />
 
-
+    <EditText
+        android:id="@+id/phoneNumberEditTextAddDriver"
+        android:layout_width="300dp"
+        android:layout_height="75dp"
+        android:hint="Phone Number"
+        android:inputType="phone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/passwordEditTextAddDriver" />
 
     <Spinner
         android:id="@+id/adminSpinnerAddDriver"
@@ -104,7 +120,6 @@
         android:id="@+id/addDriverButtonAddDriver"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="64dp"
         android:background="@drawable/round_button"
         android:text="Add Driver"
         android:textColor="@color/Black"

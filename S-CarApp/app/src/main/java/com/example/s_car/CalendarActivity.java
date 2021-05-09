@@ -32,20 +32,29 @@ public class CalendarActivity extends AppCompatActivity implements Serializable 
 
     int addEventActivity =1;
     ListView eventsListView ;
+    private User user;
     EventViewAdapter eventAdapter;
     ArrayList<Object> finalEvents;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
+        //get data from home activity
+        Intent intent = getIntent();
+        Bundle receivedData = intent.getExtras();
+        if(receivedData != null) {
+            user = (User) receivedData.getSerializable("currentUser");
+        }
+
         eventsListView = findViewById(R.id.eventsListViewCalenderActivity);
-        new getEvents().execute(StartupActivity.oo.getId());
+        new getEvents().execute(user.getId());
         eventsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(finalEvents.get(position)instanceof Event){
                     Intent intent = new Intent(CalendarActivity.this, AddEventActivity.class);
                     Bundle bundle = new Bundle();
+                    bundle.putSerializable("currentUser",user);
                     bundle.putSerializable("EventToEdit",(Event)finalEvents.get(position));
                     intent.putExtras(bundle);
                     startActivityForResult(intent,addEventActivity);
@@ -67,6 +76,9 @@ public class CalendarActivity extends AppCompatActivity implements Serializable 
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.addButtonMenu) {
             Intent intent = new Intent(getApplicationContext(), AddEventActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("currentUser",user);
+            intent.putExtras(bundle);
             startActivityForResult(intent, addEventActivity);
             return true;
         }
@@ -78,7 +90,7 @@ public class CalendarActivity extends AppCompatActivity implements Serializable 
 
         if (requestCode == addEventActivity) {
             if(resultCode == Activity.RESULT_OK){
-                new getEvents().execute(StartupActivity.oo.getId());
+                new getEvents().execute(user.getId());
                 eventAdapter.notifyDataSetChanged();
             }
         }

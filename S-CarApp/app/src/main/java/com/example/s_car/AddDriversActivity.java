@@ -40,7 +40,8 @@ import java.util.Date;
 
 public class AddDriversActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener{
     Spinner driverType;
-    EditText emailAddress , phoneNumber , name ;
+    private User user;
+    EditText emailAddressEditText , phoneNumberEditText , nameEditText,passwordEditText ;
     TextView date;
     ImageButton openDateButton,addImageButton;
     Calendar calendar;
@@ -56,14 +57,33 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
         setContentView(R.layout.activity_add_drivers);
 ////////////////////////////////////
         driverType = (Spinner) findViewById(R.id.adminSpinnerAddDriver);
-        emailAddress = (EditText) findViewById(R.id.emailAddressEditTextAddDriver);
-        phoneNumber = (EditText) findViewById(R.id.phoneNumberEditTextAddDriver);
-        name = (EditText) findViewById(R.id.nameEditTextAddDriver);
+        emailAddressEditText = (EditText) findViewById(R.id.emailAddressEditTextAddDriver);
+        phoneNumberEditText = (EditText) findViewById(R.id.phoneNumberEditTextAddDriver);
+        nameEditText = (EditText) findViewById(R.id.nameEditTextAddDriver);
+        passwordEditText = (EditText) findViewById(R.id.passwordEditTextAddDriver);
         date = (TextView) findViewById(R.id.dateTextViewAddDriver);
         openDateButton = (ImageButton) findViewById(R.id.dateImageButtonAddDriver);
         addDriverButton = (Button) findViewById(R.id.addDriverButtonAddDriver);
         addImageButton = findViewById(R.id.imageButtonAddDriver);
         imageListView = findViewById(R.id.imageListViewAddDriver);
+
+    // get user's data from drivers activity
+        Intent intent = getIntent();
+        Bundle receivedData = intent.getExtras();
+        if(receivedData != null) {
+            user = (User) receivedData.getSerializable("currentUser");
+            try{
+                Driver driverToEdit = (Driver) receivedData.getSerializable("Driver");
+                if (driverToEdit.getId() != 0) {
+                    setDriverForEdit(driverToEdit);
+                }
+            }catch (Exception ignored){}
+        }else {
+            finish();
+        }
+
+
+
 
         // set up the spinner values
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -71,8 +91,6 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         driverType.setAdapter(adapter);
 
-        // get selected driver from driver activity
-        getDriverToEdit();
 
         openDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,7 +110,6 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
                 imagesAdapter = new ImagesAdapter(getApplicationContext());
                 imageListView.setAdapter(imagesAdapter);
                 imagesAdapter.notifyDataSetChanged();
-
             }
         });
 
@@ -108,21 +125,22 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
         addDriverButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!name.getText().toString().isEmpty() && !emailAddress.getText().toString().isEmpty()&&!phoneNumber.getText().toString().isEmpty()){
+                if(!nameEditText.getText().toString().isEmpty() && !emailAddressEditText.getText().toString().isEmpty()
+                        && !phoneNumberEditText.getText().toString().isEmpty() && !passwordEditText.getText().toString().isEmpty()){
                     try {
                         if(driverType.getSelectedItem().toString().equalsIgnoreCase("Add Driver Without Time")){
-                            driver.setDrivingPermission("");
+                            driver.setDrivingPermission("No Time");
                         }else{
                             if(datePicked.isEmpty()) throw new Exception("Empty Date");
                             driver.setDrivingPermission(datePicked);
                         }
-                        driver.setName(getEncryptedText(name));
-                        driver.setCarKey(StartupActivity.oo.getCarKey());
-                        driver.setCarNumber(StartupActivity.oo.carNumber);
-                        driver.setEmailAddress(getEncryptedText(emailAddress));
-                        driver.setOwnerId(StartupActivity.oo.getId());
-                        driver.setPassword(Encryption.encrypt("kkk"));
-                        driver.setPhoneNumber(getEncryptedText(phoneNumber));
+                        driver.setName(getEncryptedText(nameEditText));
+                        driver.setCarKey(user.getCarKey());
+                        driver.setCarNumber(user.carNumber);
+                        driver.setEmailAddress(getEncryptedText(emailAddressEditText));
+                        driver.setOwnerId(user.getId());
+                        driver.setPassword(getEncryptedText(passwordEditText));
+                        driver.setPhoneNumber(getEncryptedText(phoneNumberEditText));
                         driver.setImageId(choseImage);
                         new addDriver().execute(driver);
                     }catch (Exception e){
@@ -155,9 +173,10 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
             this.driver.setLoginID(driver.getLoginID());
             choseImage = driver.getImageId();
             addImageButton.setImageResource(driver.getImageId());
-            name.setText(Encryption.decrypt(driver.getName()));
-            emailAddress.setText(Encryption.decrypt(driver.getEmailAddress()));
-            phoneNumber.setText(Encryption.decrypt(driver.getPhoneNumber()));
+            nameEditText.setText(Encryption.decrypt(driver.getName()));
+            emailAddressEditText.setText(Encryption.decrypt(driver.getEmailAddress()));
+            passwordEditText.setText(Encryption.decrypt(driver.getPassword()));
+            phoneNumberEditText.setText(Encryption.decrypt(driver.getPhoneNumber()));
             addDriverButton.setText("Update Driver");
             if(driver.getDrivingPermission().equalsIgnoreCase("")){
                 driverType.setSelection(1);
@@ -208,17 +227,6 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
             this.datePicked = datePickedFormat;
         }
     }
-    void getDriverToEdit(){
-        Intent intent = getIntent();
-        Bundle receivedData = intent.getExtras();
-        if(receivedData != null) {
-            Driver driverToEdit = (Driver) receivedData.getSerializable("Driver");
-            if (driverToEdit.getId() != 0) {
-                setDriverForEdit(driverToEdit);
-            }
-        }
-    }
-
     class addDriver extends AsyncTask<Driver , Void ,Boolean> {
 
         @Override
@@ -229,7 +237,7 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
                 ObjectOutputStream os = null;
                 ObjectInputStream ois = null;
                 String line = null;
-                URL url = new URL("http://192.168.1.26:8080/S_Car_Server_war_exploded/" + "AddDriver");
+                URL url = new URL("http://192.168.1.3:8080/S_Car_Server_war_exploded/" + "AddDriver");
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setDoOutput(true);
                 con.setDoInput(true);
@@ -263,7 +271,6 @@ public class AddDriversActivity extends AppCompatActivity implements DatePickerD
         }
     }
     class deleteDriver extends AsyncTask<Driver , Void ,Boolean> {
-
         @Override
         protected Boolean doInBackground(Driver... drivers) {
 

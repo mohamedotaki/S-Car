@@ -8,9 +8,12 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,10 +24,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.HttpURLConnection;
@@ -32,19 +31,21 @@ import java.net.URL;
 
 public class StartupActivity extends AppCompatActivity {
 
-    private static final int per=1;
+    private static final int per = 1;
     private static final String TAG = "StartupActivity";
-    ImageView coverImage , carImage;
+    ImageView coverImage, carImage;
     long time = 4000;
+    DatabaseHandler db;
     Button register, login;
-    EditText password,email;
+    EditText password, email;
     CheckBox rememberLogin;
-    public static User oo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_startup);
 
+        db = new DatabaseHandler(this);
         password = findViewById(R.id.passwordEditText);
         email = findViewById(R.id.emailEditText);
         register = findViewById(R.id.registerButton);
@@ -54,62 +55,68 @@ public class StartupActivity extends AppCompatActivity {
         rememberLogin = findViewById(R.id.rememberLogin);
 
         Animation(coverImage);
-
         VerifyPermissions();
         checkIfLoggedIn();
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!email.getText().toString().isEmpty() && !password.getText().toString().isEmpty() ){
-                   new verifyLogin().execute(email.getText().toString(),password.getText().toString());
+                if (!email.getText().toString().isEmpty() && !password.getText().toString().isEmpty() && checkInternet()) {
+                    new verifyLogin().execute(email.getText().toString(), password.getText().toString());
                     email.getText().clear();
                     password.getText().clear();
-
-
-                }else{
-                    Toast.makeText(StartupActivity.this,"Email & Password can't be empty",Toast.LENGTH_SHORT).show();
+                } else if(!email.getText().toString().isEmpty() && !password.getText().toString().isEmpty() && !checkInternet()) {
+                    try {
+                        User user = db.getUser(Encryption.encrypt(email.getText().toString()),
+                                Encryption.encrypt(password.getText().toString()));
+                        if(user != null){
+                            Toast.makeText(StartupActivity.this, "Offline Mode", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putSerializable("currentUser", user);
+                            intent.putExtras(bundle);
+                            startActivity(intent);
+                            finish();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(StartupActivity.this, "Email & Password can't be empty", Toast.LENGTH_SHORT).show();
                 }
-
-
             }
         });
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goTo(Register.class);
+                Intent intent = new Intent(getApplicationContext(), Register.class);
+                startActivity(intent);
             }
         });
 
 
-
-
-
     }
-    private void goTo(Class activity){
-            Intent intent = new Intent(getApplicationContext(),activity);
-            startActivity(intent);
-    }
-    public void Animation(ImageView image){
-        ObjectAnimator animator = ObjectAnimator.ofFloat(image,"x",1000f);
+
+    public void Animation(ImageView image) {
+        ObjectAnimator animator = ObjectAnimator.ofFloat(image, "x", 1000f);
         animator.setDuration(time);
         AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.playTogether(animator);
         animatorSet.start();
     }
 
-    private void checkIfLoggedIn(){
-        SharedPreferences preferences = getSharedPreferences("CheckBox",MODE_PRIVATE);
-        String checkBox = preferences.getString("remember","");
-        if(checkBox.equals("true")){
-           // GoMain();
-        }else if (checkBox.equals("false")){
-            Toast.makeText(StartupActivity.this,"Please Login",Toast.LENGTH_SHORT).show();
+    private void checkIfLoggedIn() {
+        SharedPreferences preferences = getSharedPreferences("CheckBox", MODE_PRIVATE);
+        String checkBox = preferences.getString("remember", "");
+        if (checkBox.equals("true")) {
+            // GoMain();
+        } else if (checkBox.equals("false")) {
+            Toast.makeText(StartupActivity.this, "Please Login", Toast.LENGTH_SHORT).show();
 
         }
     }
 
     private void VerifyPermissions() {
-        Log.d( TAG, "verifyPermissions: asking user for permissions");
+        Log.d(TAG, "verifyPermissions: asking user for permissions");
         String[] permissions = {
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -120,7 +127,7 @@ public class StartupActivity extends AppCompatActivity {
                 Manifest.permission.BLUETOOTH_ADMIN,
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.READ_PHONE_STATE};
-        if (    ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[0]) == PackageManager.PERMISSION_GRANTED &&
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[0]) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[1]) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[2]) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[3]) == PackageManager.PERMISSION_GRANTED &&
@@ -128,18 +135,28 @@ public class StartupActivity extends AppCompatActivity {
                 ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[5]) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[6]) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[7]) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[8]) == PackageManager.PERMISSION_GRANTED){
+                ContextCompat.checkSelfPermission(this.getApplicationContext(), permissions[8]) == PackageManager.PERMISSION_GRANTED) {
         } else {
             ActivityCompat.requestPermissions(StartupActivity.this, permissions, per);
 
         }
     }
+
+    private boolean checkInternet() {
+        // code from https://stackoverflow.com/questions/4238921/detect-whether-there-is-an-internet-connection-available-on-android
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         VerifyPermissions();
     }
 
-    class verifyLogin extends AsyncTask<String , Void ,User>{
+    class verifyLogin extends AsyncTask<String, Void, User> {
 
         @Override
         protected User doInBackground(String... strings) {
@@ -163,10 +180,8 @@ public class StartupActivity extends AppCompatActivity {
                 os.writeObject(Encryption.encrypt(pass));
                 os.flush();
                 os.close();
-
                 ois = new ObjectInputStream(con.getInputStream());
-                oo = (User) ois.readObject();
-                return oo;
+                return (User) ois.readObject();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -175,10 +190,24 @@ public class StartupActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(User user) {
-            if(user != null){
-                goTo(HomeActivity.class);
+            if (user != null) {
+                //update or add user in local database
+                if(db.getUserCount()>0){
+                    if(db.getUser(user.getEmailAddress(),user.getPassword()) != null) {
+                        db.updateUser(user);
+                    }else {
+                        db.addUser(user);
+                    }
+                }else{
+                    db.addUser(user);
+                }
+                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("currentUser", user);
+                intent.putExtras(bundle);
+                startActivity(intent);
                 finish();
-            }else{
+            } else {
                 Toast.makeText(StartupActivity.this, "Wrong Email or Password", Toast.LENGTH_SHORT).show();
             }
         }

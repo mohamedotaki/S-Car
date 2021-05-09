@@ -1,6 +1,7 @@
 package com.example.s_car;
-
+//map code is from mapquest documentation
 import android.Manifest;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -43,6 +45,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -54,10 +57,13 @@ public class MapActivity extends AppCompatActivity {
     double lon =0,lat=0;
     private MapView mMapView;
     private MapboxMap mMapboxMap;
+    JSONObject maneuversToSend = null;
     Polyline oldPolyLine;
     ImageButton searchButton;
     EditText addressEditText;
     FloatingActionButton sendDirectionsButton;
+    BluetoothSocket bluetoothSocket = HomeActivity.bluetoothSocket;
+    OutputStream outputStream =null;
     private final LatLng HOME_LOCATION = new LatLng(53.766258, -8.781946);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +75,13 @@ public class MapActivity extends AppCompatActivity {
         mMapView = (MapView) findViewById(R.id.mapquestMapView);
         sendDirectionsButton = (FloatingActionButton)findViewById(R.id.sendDirectionsToCarFloatingButton);
 
+        try {
+            if(bluetoothSocket != null && bluetoothSocket.isConnected()) {
+                outputStream = bluetoothSocket.getOutputStream();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(new OnMapReadyCallback() {
@@ -96,10 +109,23 @@ public class MapActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //Send data to car
+                if(bluetoothSocket.isConnected() && maneuversToSend != null){
+                    try {
+                    outputStream.write(1); // start of heading ascii table
+                    outputStream.write(maneuversToSend.toString().getBytes());
+                    outputStream.write(4);
+                    Toast.makeText(getBaseContext(),"Directions was sent",Toast.LENGTH_SHORT).show();
+                    sendDirectionsButton.setVisibility(View.GONE);
+                    } catch (IOException e) {
+                        Toast.makeText(getBaseContext(),"Failed to Send Directions",Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
+                    }
+                }
             }
         });
 
     }
+
 
     private class Route extends AsyncTask<String, Void, String> {
         protected String doInBackground(String... args){
@@ -137,6 +163,7 @@ public class MapActivity extends AppCompatActivity {
                     while ((line = rd.readLine()) != null) {
                         json.append(line);
                     }
+
                 } catch (Exception e) {
                     System.out.println("catch B: " + e.toString());
                 } finally {
@@ -155,6 +182,19 @@ public class MapActivity extends AppCompatActivity {
                         .getJSONObject("route")
                         .getJSONObject("shape")
                         .getJSONArray("shapePoints");
+
+                JSONArray maneuverIndexes = new JSONObject(json)
+                        .getJSONObject("route")
+                        .getJSONObject("shape")
+                        .getJSONArray("maneuverIndexes");
+
+                JSONArray maneuvers = new JSONObject(json)
+                        .getJSONObject("route")
+                        .getJSONObject("shape")
+                        .getJSONArray("shapePoints");
+                maneuversToSend = new JSONObject();
+                maneuversToSend.put("maneuverIndexes",maneuverIndexes);
+                maneuversToSend.put("maneuvers",maneuvers);
 
                 // get every other shape point
                 int pointcount = points.length() / 2;
@@ -250,6 +290,5 @@ public class MapActivity extends AppCompatActivity {
         }
         return null;
     }
-
 
 }
