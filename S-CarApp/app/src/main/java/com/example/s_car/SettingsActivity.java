@@ -35,6 +35,7 @@ public class SettingsActivity extends AppCompatActivity {
     ArrayList<BluetoothDevice> bluetoothDevicesArrayList = new ArrayList<BluetoothDevice>();
     BluetoothSocket bluetoothSocket = HomeActivity.bluetoothSocket;
     OutputStream outputStream;
+    User user;
     Thread bluetoothThread;
     BluetoothAdapter blueAdapter = BluetoothAdapter.getDefaultAdapter();
     ArrayList<String> wifiName = new ArrayList<>();
@@ -55,6 +56,11 @@ public class SettingsActivity extends AppCompatActivity {
         bluetoothListView = findViewById(R.id.bluetoothListView);
         bluetoothButton = findViewById(R.id.bluetoothButtonSettings);
 
+        Intent intent = getIntent();
+        Bundle receivedData = intent.getExtras();
+        if(receivedData != null) {
+            user = (User) receivedData.getSerializable("currentUser");
+        }
 
         /////////BlueTooth
         bluetoothDevicesArray = availableBluetooth(); // get all available bluetooth devices
@@ -66,11 +72,12 @@ public class SettingsActivity extends AppCompatActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     try {
-                         bluetoothSocket = HomeActivity.connectToDevice(bluetoothDevicesArrayList.get(position));
+                         bluetoothSocket = HomeActivity.connectToDevice(bluetoothDevicesArrayList.get(position),user);
                         if (bluetoothSocket.isConnected()) {
                            SharedPreferences sharedPref = getSharedPreferences("settings", MODE_PRIVATE);
                            sharedPref.edit().putString("bluetoothDeviceName", bluetoothDevicesArrayList.get(position).getName()).apply();
                             Toast.makeText(SettingsActivity.this,"Connected to "+ bluetoothDevicesArrayList.get(position).getName(),Toast.LENGTH_SHORT).show();
+
                            outputStream = bluetoothSocket.getOutputStream();
                            bluetoothButton.setText("Disconnect");
                            bluetoothButton.setVisibility(View.VISIBLE);

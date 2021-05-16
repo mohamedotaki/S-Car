@@ -157,7 +157,6 @@ public class StartupActivity extends AppCompatActivity {
     }
 
     class verifyLogin extends AsyncTask<String, Void, User> {
-
         @Override
         protected User doInBackground(String... strings) {
 

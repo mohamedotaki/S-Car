@@ -15,7 +15,6 @@ public class User implements Serializable {
     String carKey ="";
     int imageId;
 
-
     public User() {
     }
 

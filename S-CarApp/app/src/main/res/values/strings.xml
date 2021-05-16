@@ -11,6 +11,8 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="title_activity_add_drivers">AddDriversActivity</string>
     <string name="front_sensor">Front Sensor</string>
+    <string name="map">Map</string>
+    <string name="status">status</string>
 
     <string-array name="add_driver_spinner">
         <item>Add Driver With Time</item>

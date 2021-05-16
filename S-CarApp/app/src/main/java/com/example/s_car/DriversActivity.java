@@ -84,7 +84,7 @@ public class DriversActivity extends AppCompatActivity {
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("currentUser",user);
                 intent.putExtras(bundle);
-                startActivity(intent);
+                startActivityForResult(intent, driversActivityRequestCode);
                 return true;
         }
         return super.onOptionsItemSelected(item);

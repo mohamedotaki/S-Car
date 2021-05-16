@@ -3,14 +3,14 @@ package com.example.s_car;
 import java.io.Serializable;
 
 public class Event implements Serializable {
-    int id =0;
-    int ownerId=0;
-    String title ="";
-    String date = "";
-    String time="";
-    String address1 ="";
-    String town= "";
-    String county ="";
+    private int id =0;
+    private int ownerId=0;
+    private String title ="";
+    private String date = "";
+    private String time="";
+    private String address1 ="";
+    private String town= "";
+    private String county ="";
 
     public Event() {
     }

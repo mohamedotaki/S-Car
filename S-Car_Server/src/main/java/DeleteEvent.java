@@ -28,7 +28,6 @@ public class DeleteEvent extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/octet-stream");
-
         boolean result = false;
         InputStream in = request.getInputStream();
         ObjectInputStream inputFromApp = new ObjectInputStream(in);
@@ -48,8 +47,6 @@ public class DeleteEvent extends HttpServlet {
                     result = true;
                 deleteEvent.close();
             }
-
-
             con.close();
         }
         catch(Exception ex)

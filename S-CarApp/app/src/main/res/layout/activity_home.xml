@@ -112,22 +112,23 @@
         android:layout_marginBottom="24dp"
         android:background="@color/main"
         android:outlineProvider="none"
-        android:text="Map"
+        android:text="@string/map"
         android:textColor="@color/Black"
-        android:textSize="20dp"
+        android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/carImage"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/DriversButton" />
 
     <Button
+        android:id="@+id/statusButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:background="@color/main"
         android:outlineProvider="none"
-        android:text="status"
+        android:text="@string/status"
         android:textColor="@color/Black"
-        android:textSize="20dp"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/controlButton"
         app:layout_constraintTop_toBottomOf="@+id/carImage" />

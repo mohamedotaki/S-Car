@@ -68,6 +68,10 @@ void bluetooth() {
           // get user input from the app
           getWifiDetailsFromApp();
           break;
+      case 1: 
+          // get user input from the app
+         Serial.println(readBTInput());
+          break;
     } // end of BT read
   }
 } // end of BT function
@@ -81,17 +85,21 @@ void sendSensorsValue() {
 void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param){
   if(event == ESP_SPP_SRV_OPEN_EVT){
     Serial.println("Client Connected");
-    Serial.println(readBTInput());
+   // vTaskResume( checkUserHandle);
     
   }
 }
 
-Sring readBTInput(){
+String readBTInput(){
   BTDataInput="";
   byte b;
-  while (b != 4) {
+  while (true) {
   b = SerialBT.read();
+  if(b == 4){
+    break;
+  }
       BTDataInput += (char) b;
+        Serial.println(BTDataInput);
   }
   return BTDataInput;
 }

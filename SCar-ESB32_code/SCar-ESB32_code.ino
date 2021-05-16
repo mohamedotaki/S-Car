@@ -17,7 +17,7 @@
 
 BluetoothSerial SerialBT;
 static EventGroupHandle_t  xEventGroup;
-TaskHandle_t task1Handle = NULL, ultrasonicTaskHandle = NULL, powerManagementTaskHandle = NULL , statusUpdateHandle = NULL;
+TaskHandle_t task1Handle = NULL, ultrasonicTaskHandle = NULL, powerManagementTaskHandle = NULL , statusUpdateHandle = NULL ,checkUserHandle = NULL;
 
 //no changes
 // Servo
@@ -57,10 +57,11 @@ unsigned long timeout = 0;
 
 //BT 
 
-String BTDataInput="";
+String BTDataInput;
 
 void mainTask( void *pvParameters );
-//void powerManagementTask( void *pvParameters );
+void checkUser( void *pvParameters );
+void ultrasonicTask( void *pvParameters );
 //void wifiTask( void *pvParameters );
 
 void setup() {
@@ -87,17 +88,22 @@ void setup() {
   delay(500);
   ledcWrite(escChan, 1489);
   delay(1000);
+
+  connectToSavedWifi();
+
   // Tasks
   xEventGroup  =  xEventGroupCreate();
   xTaskCreatePinnedToCore(mainTask, "mainTask", 3000, NULL, 3, &task1Handle, 0);
   xTaskCreatePinnedToCore(ultrasonicTask, "ultrasonicTask", 3000, NULL, 4, &ultrasonicTaskHandle, 0);
+  xTaskCreatePinnedToCore(checkUser, "checkUser", 1000, NULL, 4, &checkUserHandle, 1);
   //xTaskCreatePinnedToCore(statusUpdate, "statusUpdate", 2000, NULL, 3, &statusUpdateHandle, 1);
   //xTaskCreatePinnedToCore(powerManagementTask, "powerManagementTask", 200, NULL, 3, &powerManagementTaskHandle, 1);
-  //vTaskSuspend(ultrasonicTaskHandle);
+  vTaskSuspend(ultrasonicTaskHandle);
+  //vTaskSuspend(checkUserHandle);
   //vTaskSuspend(task1Handle);
 
 
-connectToSavedWifi();
+
 
 
 }
@@ -154,16 +160,6 @@ void ultrasonicTask(void *pvParameters)
   }
 }
 
-//void powerManagementTask(void *pvParameters)
-//{
-//  for (;;)
-//  {
-//
-//
-//    vTaskDelay(10);
-//  }
-//}
-
 void mainTask(void *pvParameters)
 {
   for (;;)
@@ -172,4 +168,21 @@ void mainTask(void *pvParameters)
     
     vTaskDelay(10);  // one tick delay (15ms) in between reads for stability
   }
+}
+
+void checkUser(void *pvParameters)
+{
+  for (;;)
+  {
+    // Serial.println("out");
+
+    if(SerialBT.read() == 1){
+           Serial.println("inside");
+      Serial.println(readBTInput());
+          //vTaskResume(task1Handle);
+        //vTaskSuspend(checkUserHandle);
+    }
+    vTaskDelay(10);  // one tick delay (15ms) in between reads for stability
+  
+}
 }

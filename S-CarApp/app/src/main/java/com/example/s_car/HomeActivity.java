@@ -30,7 +30,7 @@ import java.util.Date;
 import java.util.Set;
 
 public class HomeActivity extends AppCompatActivity {
-    Button controlButton, settingsButton, driversButton, calendarButton, mapButton;
+    Button controlButton, settingsButton, driversButton, calendarButton, mapButton, statusButton;
     TextView timeLeft, accountType, userName;
     public static BluetoothSocket bluetoothSocket;
     private User user;
@@ -45,6 +45,7 @@ public class HomeActivity extends AppCompatActivity {
         calendarButton = findViewById(R.id.calendarButtonHomeActivity);
         settingsButton = findViewById(R.id.settingsButton);
         driversButton = findViewById(R.id.DriversButton);
+        statusButton = findViewById(R.id.statusButton);
         accountType = findViewById(R.id.accountTypeTextViewHome);
         timeLeft = findViewById(R.id.timeLeftTextViewHome);
         userName = findViewById(R.id.userNameTextViewHome);
@@ -77,21 +78,15 @@ public class HomeActivity extends AppCompatActivity {
             timeLeft.setVisibility(View.GONE);
         }
 
-        try {
-            availableBluetooth();
-        } catch (Exception e) {
-            Toast.makeText(HomeActivity.this, "Not Connected to Car", Toast.LENGTH_SHORT).show();
-        }
-
-
         ///////Buttons on click listener
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (user.getDrivingPermission().equals("")) {
-                    goTo(SettingsActivity.class);
-                } else
-                    Toast.makeText(HomeActivity.this, "Only Owners Have Access", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("currentUser", user);
+                intent.putExtras(bundle);
+                startActivity(intent);
             }
         });
         driversButton.setOnClickListener(new View.OnClickListener() {
@@ -143,6 +138,16 @@ public class HomeActivity extends AppCompatActivity {
                 }
             }
         });
+        statusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(), StatusActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("currentUser", user);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+            }
+        });
 
     }
 
@@ -166,18 +171,17 @@ public class HomeActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    void availableBluetooth() throws Exception {
-
-
-    }
-
-    static BluetoothSocket connectToDevice(BluetoothDevice device) throws Exception {
+    static BluetoothSocket connectToDevice(BluetoothDevice device, User user) throws Exception {
         ParcelUuid[] uuids = device.getUuids();
         BluetoothSocket socket = device.createRfcommSocketToServiceRecord(uuids[0].getUuid());
         if (!socket.isConnected()) {
             socket.connect();
         }
         if (socket.isConnected()) {
+           // OutputStream outputStream = socket.getOutputStream();
+           // outputStream.write(1);
+            //outputStream.write(user.getCarKey().getBytes());
+            //outputStream.write(4);
             return socket;
         }
         return null;
@@ -199,7 +203,6 @@ public class HomeActivity extends AppCompatActivity {
     class connectToBluetooth extends AsyncTask<Void , Void ,Boolean> {
         @Override
         protected Boolean doInBackground(Void... voids) {
-
             try {
                 BluetoothAdapter blueAdapter = BluetoothAdapter.getDefaultAdapter();
                 String bluetoothDeviceName = sharedPreferences.getString("bluetoothDeviceName", "noName");
@@ -212,7 +215,7 @@ public class HomeActivity extends AppCompatActivity {
                                 for (int i = 0; i < bondedDevices.size(); i++) {
                                     BluetoothDevice device = (BluetoothDevice) devices[i];
                                     if (bluetoothDeviceName.equalsIgnoreCase(device.getName())) {
-                                        bluetoothSocket = connectToDevice(device);
+                                        bluetoothSocket = connectToDevice(device, user);
                                         if (bluetoothSocket.isConnected()) {
                                             return true;
                                         }
