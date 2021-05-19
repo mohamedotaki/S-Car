@@ -135,11 +135,14 @@ void ultrasonicTask(void *pvParameters)
     if ((xEventGroupValue & frontSensorBit) != 0) {
       f = ultrasonicValue(frontSensor);
       if (f < 5) {
-        // motorEmergncyStop();
+        motorS();
       }
     }
     if ((xEventGroupValue & backSensorBit) != 0) {
       b = ultrasonicValue(backSensor);
+       if (b < 5) {
+        motorS();
+      }
     }
     if ((xEventGroupValue & leftSensorBit) != 0) {
       r = ultrasonicValue(rightSensorB);
