@@ -19,15 +19,15 @@ String readFromEEPROM(int address) {
   c = EEPROM.read(address);
   for (; i < 39; i++) {
     c = EEPROM.read(address + i);
-    if(c == '\0') break;
+    if (c == '\0') break;
     stringOut += c;
   }
   return stringOut;
 }
 
-void clearAddress(int startAddress){
-  for(int i =startAddress; i < startAddress+39; i++){
-  EEPROM.write( i,0);
+void clearAddress(int startAddress) {
+  for (int i = startAddress; i < startAddress + 39; i++) {
+    EEPROM.write( i, 0);
   }
   EEPROM.commit();
 }

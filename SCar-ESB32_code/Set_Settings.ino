@@ -1,7 +1,7 @@
-void setSettings(){
-  
+void setSettings() {
+
 }
 
-void checkDetails(){
-  
+void checkDetails() {
+
 }

@@ -1,7 +1,7 @@
 void scanNetworks()
 {
   int numberOfNetworks = WiFi.scanNetworks();
-  
+
   Serial.print("Number of networks found: ");
   Serial.println(numberOfNetworks);
   char buff[50];
@@ -83,9 +83,9 @@ void getWifiDetailsFromApp() {
   }
 }
 
-void getLastEvent(int ownerID, int updateTime){
+void getLastEvent(int ownerID, int updateTime) {
   unsigned long lastRun = 0;
- //Send an HTTP POST request every 10 minutes
+  //Send an HTTP POST request every 10 minutes
   if ((millis() - lastRun) > updateTime) {
     if (WiFi.status() == WL_CONNECTED && ownerID > 0) {
       String dataToSend = "{\"EventID\":\"";
@@ -116,7 +116,7 @@ void getLastEvent(int ownerID, int updateTime){
     }
     lastRun = millis();
   }
-  
+
 }
 
 void listenForChanges() {

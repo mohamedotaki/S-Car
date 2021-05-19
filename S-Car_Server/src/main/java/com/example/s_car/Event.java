@@ -3,6 +3,7 @@ package com.example.s_car;
 import java.io.Serializable;
 
 public class Event implements Serializable {
+    private static final long serialVersionUID = 6529685098267757690L;
     int id =0;
     int ownerId=0;
     String title ="";

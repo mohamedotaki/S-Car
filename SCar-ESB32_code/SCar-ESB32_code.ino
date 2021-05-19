@@ -1,8 +1,13 @@
+#define RXD2 16
+#define TXD2 17
 #define frontSensorBit (1 << 0)
 #define rightSensorBit (1<<1)
 #define leftSensorBit (1<<2)
 #define backSensorBit (1<<3)
 #define sendSensorsValueBit (1<<4)
+#define parkingAssistBit (1<<5)
+#define autonomousDrivingBit (1<<6)
+#define allFeatureBits (parkingAssistBit | autonomousDrivingBit)
 #define allSensorBits (frontSensorBit | rightSensorBit | leftSensorBit | backSensorBit)
 #include <WiFi.h>
 #include <HTTPClient.h>
@@ -17,7 +22,7 @@
 
 BluetoothSerial SerialBT;
 static EventGroupHandle_t  xEventGroup;
-TaskHandle_t task1Handle = NULL, ultrasonicTaskHandle = NULL, powerManagementTaskHandle = NULL , statusUpdateHandle = NULL ,checkUserHandle = NULL;
+TaskHandle_t task1Handle = NULL, ultrasonicTaskHandle = NULL, powerManagementTaskHandle = NULL , featuresTaskHandle = NULL , checkUserHandle = NULL;
 
 //no changes
 // Servo
@@ -55,19 +60,21 @@ int timeToSleep = 0;
 unsigned long myTime = 0;
 unsigned long timeout = 0;
 
-//BT 
+//BT
 
 String BTDataInput;
 
 void mainTask( void *pvParameters );
-void checkUser( void *pvParameters );
+//void checkUser( void *pvParameters );
 void ultrasonicTask( void *pvParameters );
 //void wifiTask( void *pvParameters );
+
 
 void setup() {
   EEPROM.begin(255);
   //Initialize serial communication:
   Serial.begin(115200);
+  Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
   //Bluetooth setup
   SerialBT.begin("S-Car");
   SerialBT.register_callback(callback);
@@ -95,42 +102,29 @@ void setup() {
   xEventGroup  =  xEventGroupCreate();
   xTaskCreatePinnedToCore(mainTask, "mainTask", 3000, NULL, 3, &task1Handle, 0);
   xTaskCreatePinnedToCore(ultrasonicTask, "ultrasonicTask", 3000, NULL, 4, &ultrasonicTaskHandle, 0);
-  xTaskCreatePinnedToCore(checkUser, "checkUser", 1000, NULL, 4, &checkUserHandle, 1);
-  //xTaskCreatePinnedToCore(statusUpdate, "statusUpdate", 2000, NULL, 3, &statusUpdateHandle, 1);
-  //xTaskCreatePinnedToCore(powerManagementTask, "powerManagementTask", 200, NULL, 3, &powerManagementTaskHandle, 1);
+  xTaskCreatePinnedToCore(featuresTask, "featuresTask", 2000, NULL, 3, &featuresTaskHandle, 1);
   vTaskSuspend(ultrasonicTaskHandle);
-  //vTaskSuspend(checkUserHandle);
-  //vTaskSuspend(task1Handle);
-
-
-
-
-
 }
 
-void loop() {
-  //Serial.print(pulseIn(26,LOW));
-  //Serial.print("--");
-  //Serial.print(pulseIn(26,HIGH));
-  //Serial.print("--------");
-  //Serial.print(pulseIn(25,LOW));
-  //Serial.print("--");
-  //Serial.println(pulseIn(25,HIGH));
+void loop() {}
+
+void featuresTask(void *pvParameters)
+{
+  EventBits_t xEventGroupValue;
+  for (;;)
+  {
+    xEventGroupValue  = xEventGroupWaitBits(xEventGroup, allFeatureBits , pdTRUE, pdFALSE, portMAX_DELAY );
+    if ((xEventGroupValue & autonomousDrivingBit) != 0) {
+      Serial.println("autonomous driving is on ");
+      autonomousDriving();
+    }
+    if ((xEventGroupValue & parkingAssistBit) != 0) {
+      Serial.println("parking assist activated");
+      parkingAssist();
+    }
+    vTaskDelay(10);
+  }
 }
-
-
-//void statusUpdate(void *pvParameters)
-//{
-//  for (;;)
-//  {
-//
-//
-//    vTaskDelay(10);
-//  }
-//}
-
-
-
 
 void ultrasonicTask(void *pvParameters)
 {
@@ -141,7 +135,7 @@ void ultrasonicTask(void *pvParameters)
     if ((xEventGroupValue & frontSensorBit) != 0) {
       f = ultrasonicValue(frontSensor);
       if (f < 5) {
-        motorEmergncyStop();
+        // motorEmergncyStop();
       }
     }
     if ((xEventGroupValue & backSensorBit) != 0) {
@@ -165,24 +159,8 @@ void mainTask(void *pvParameters)
   for (;;)
   {
     bluetooth();
-    
+    //getLastEvent(1 , 10000);
+
     vTaskDelay(10);  // one tick delay (15ms) in between reads for stability
   }
-}
-
-void checkUser(void *pvParameters)
-{
-  for (;;)
-  {
-    // Serial.println("out");
-
-    if(SerialBT.read() == 1){
-           Serial.println("inside");
-      Serial.println(readBTInput());
-          //vTaskResume(task1Handle);
-        //vTaskSuspend(checkUserHandle);
-    }
-    vTaskDelay(10);  // one tick delay (15ms) in between reads for stability
-  
-}
 }

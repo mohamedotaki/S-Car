@@ -68,7 +68,9 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
                 if (event.getId() != 0) {
                     setEventToEdit(event);
                 }
-            }catch (Exception ignored){}
+            }catch (Exception ignored){
+                event = new Event();
+            }
         }else {
             finish();
         }
@@ -113,6 +115,7 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
             @Override
             public void onClick(View v) {
                 try {
+                    System.err.print(user.getId());
                     event.setOwnerId(user.getId());
                     event.setTitle(Encryption.encrypt(eventTitle.getText().toString()));
                     event.setAddress1(Encryption.encrypt(address1.getText().toString()));
@@ -120,7 +123,9 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
                     event.setCounty(Encryption.encrypt(county.getText().toString()));
                     event.setDate(Encryption.encrypt(datePicked));
                     event.setTime(Encryption.encrypt(timePicked));
-                }catch (Exception e){}
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
                 new addEvent().execute(event);
             }
         });

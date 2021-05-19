@@ -1,30 +1,30 @@
-  void motorF(int speedRequiered){
-  ledcWrite(escChan,speedRequiered);
+void motorF(int speedRequiered) {
+  ledcWrite(escChan, speedRequiered);
   delay(10);
-    
+
 }
 
-void motorR(int speedRequiered){
-  if(speedRequiered<1500){
-  ledcWrite(escChan,speedRequiered);
-  delay(10);
+void motorR(int speedRequiered) {
+  if (speedRequiered < 1500) {
+    ledcWrite(escChan, speedRequiered);
+    delay(10);
   }
 }
 
 
 
-void motorS(){
-      ledcWrite(escChan,1400);
-      delay(500);
-    ledcWrite(escChan,1489);
-      delay(100);
+void motorS() {
+  ledcWrite(escChan, 1400);
+  delay(500);
+  ledcWrite(escChan, 1489);
+  delay(100);
 }
 
-   void motorEmergncyStop(){
-    ledcWrite(escChan,1300);
-    delay(200);
-    ledcWrite(escChan,1495);
-      delay(10);
+void motorEmergncyStop() {
+  ledcWrite(escChan, 1300);
+  delay(200);
+  ledcWrite(escChan, 1495);
+  delay(10);
 }
 
 //int getRotation(){
